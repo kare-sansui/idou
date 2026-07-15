@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>移動記録ナビシステム</title>
+
+<style>
+body{
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background:#f5f7fa;
+    max-width:450px;
+    margin:auto;
+    padding:20px;
+    color: #1f2937;
+    -webkit-text-size-adjust:100%;
+    touch-action: manipulation;
+}
+
+h2{ text-align:center; color: #2c3e50; margin-bottom: 20px; }
+h3{ margin-top:25px; border-bottom:2px solid #34495e; padding-bottom:5px; color: #34495e; font-size: 16px; }
+
+label{
+    display:block;
+    margin-top:15px;
+    font-weight:bold;
+    font-size: 13px;
+    color: #374151;
+}
+
+input[type="text"], select {
+    width:100%;
+    padding:12px;
+    margin-top:6px;
+    font-size:15px;
+    box-sizing:border-box;
+    border: 1px solid #ccd4dc;
+    border-radius: 8px;
+    background: #fff;
+    min-height: 44px;
+}
+
+/* ===== 入力必須エラー表示 ===== */
+input.input-error{
+    border:2px solid #c0392b;
+    background:#fff6f6;
+}
+select.input-error{
+    border:2px solid #c0392b;
+    background:#fff6f6;
+}
+
+/* ===== 再開バナー ===== */
+.resume-banner{
+    display:none;
+    background:#eaf3ff;
+    border:2px solid #3a6ea5;
+    border-radius:10px;
+    padding:12px;
+    margin-bottom:15px;
+    text-align:center;
+    font-size:14px;
+}
+.resume-banner.show{ display:block; }
+.resume-banner button{
+    width:auto;
+    padding:8px 16px;
+    margin:0 5px;
+    border:none;
+    border-radius:6px;
+    font-size:14px;
+    cursor:pointer;
+    font-weight: bold;
+}
+.resume-banner .resume-yes{ background:#2c3e50; color:#fff; }
+.resume-banner .resume-no{ background:#fff; color:#c0392b; border:2px solid #c0392b; }
+
+/* ===== 📋 ルート設定エリア ===== */
+.route-builder-box {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.route-node {
+    background: #fdfdfd;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px 14px 14px 34px;
+    margin-bottom: 14px;
+    position: relative;
+}
+.route-node::before{
+    content:"";
+    position:absolute;
+    left:15px; top:-14px; height:14px;
+    width:2px;
+    background:#cbd5e0;
+}
+.route-node:first-child::before{ display:none; }
+.route-node::after{
+    content:"";
+    position:absolute;
+    left:9px; top:18px;
+    width:14px; height:14px;
+    border-radius:50%;
+    background:#fff;
+    border:3px solid #a0aec0;
+}
+.route-node.start-node::after{ border-color:#3182ce; background:#3182ce; }
+.route-node.end-node::after{ border-color:#2ecc71; background:#2ecc71; }
+.route-node.start-node { border-color: #3182ce; background: #f7fafc; }
+.route-node.end-node { border-color: #2ecc71; background: #f0fff4; }
+
+.route-node .node-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    font-weight: bold;
+    color: #4a5568;
+    margin-bottom: 6px;
+}
+.route-node .node-label { font-size: 14px; }
+.route-node.start-node .node-label { color: #3182ce; }
+.route-node.end-node .node-label { color: #27ae60; }
+
+.route-node .remove-node-btn {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    color: #e53e3e;
+    cursor: pointer;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+}
+
+.route-link-ui {
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#f8fbff;
+    border:1px solid #dbeafe;
+    border-radius:999px;
+    padding:7px 10px;
+    margin:0 0 10px 0;
+    width:100%;
+    box-sizing:border-box;
+    font-size:12px;
+}
+.route-link-ui .link-label{
+    color:#64748b;
+    font-weight:600;
+    margin-bottom:0;
+    white-space:nowrap;
+    font-size:11px;
+}
+.route-link-ui .node-mode{
+    flex:1;
+    border:none;
+    background:transparent;
+    padding:2px 20px 2px 2px;
+    font-size:13px;
+    font-weight:600;
+    color:#1f2937;
+    appearance:none;
+    -webkit-appearance:none;
+    -moz-appearance:none;
+    cursor:pointer;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%236b7280'%3E%3Cpath d='M5.25 7.5l4.75 4.75 4.75-4.75' stroke='%236b7280' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 2px center;
+    background-size:12px;
+}
+.route-link-ui .node-mode:focus{
+    outline:none;
+}
+.mode-chip-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+}
+.mode-chip{
+    flex:1 1 auto;
+    min-width:52px;
+    text-align:center;
+    padding:6px 4px 5px 4px;
+    border:2px solid #e2e8f0;
+    border-radius:8px;
+    background:#fff;
+    cursor:pointer;
+    user-select:none;
+    font-size:16px;
+    line-height:1.1;
+}
+.mode-chip span{
+    display:block;
+    font-size:10px;
+    font-weight:bold;
+    color:#4a5568;
+    margin-top:2px;
+}
+.mode-chip.selected{
+    border-color:#3182ce;
+    background:#3182ce;
+}
+.mode-chip.selected span{ color:#fff; }
+
+.builder-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+.builder-actions button {
+    flex: 1;
+    padding: 12px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 8px;
+    border: 1px solid #cbd5e0;
+    background: #fff;
+    font-weight: bold;
+}
+#btnLockRoute { background: #2ecc71; color: #fff; border: none; }
+
+/* ===== 行き帰りチップ ===== */
+.chip-group{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+.chip{
+    flex:1 1 auto;
+    text-align:center;
+    padding:11px;
+    font-size:14px;
+    border: 1px solid #e2e8f0;
+    border-radius:8px;
+    background:#fff;
+    color:#4a5568;
+    cursor:pointer;
+    user-select:none;
+    font-weight: bold;
+}
+.chip.selected{ border-color:#3182ce; background:#3182ce; color:#fff; }
+
+/* ===== 🧍 リアルタイム姿勢選択エリア ===== */
+.posture-selector-box {
+    background: #fff;
+    border: 2px solid #cbd5e0;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.posture-title { font-weight: bold; font-size: 14px; color: #2c3e50; margin-bottom: 8px; }
+
+/* ===== 🚦 ナビゲーション表示 ===== */
+.nav-display {
+    background: linear-gradient(135deg,#ebf8ff,#e6f0fb);
+    border: 2px solid #4299e1;
+    border-radius: 18px;
+    padding: 18px 16px;
+    margin-bottom: 15px;
+    text-align: center;
+    box-shadow: 0 8px 24px rgba(66,153,225,0.16);
+}
+.nav-icon{ font-size:40px; line-height:1; margin-bottom:6px; }
+.nav-progress{ font-size:11px; font-weight:bold; color:#4299e1; background:#fff; display:inline-block; padding:2px 10px; border-radius:10px; margin-bottom:8px; }
+.nav-mode-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    margin: 2px auto 10px auto;
+    padding:8px 12px;
+    border-radius:999px;
+    background:#fff;
+    border:2px solid #bfdbfe;
+    color:#1d4ed8;
+    font-size:13px;
+    font-weight:800;
+    box-shadow:0 2px 6px rgba(59,130,246,0.12);
+}
+.nav-grid{ display:grid; gap:10px; margin-top:8px; text-align:left; }
+.nav-card{ background:linear-gradient(135deg,rgba(255,255,255,0.96),rgba(248,250,252,0.96)); border:1px solid rgba(66,153,225,0.18); border-radius:12px; padding:10px 12px; }
+.nav-card-title{ font-size:10px; font-weight:bold; color:#4b5563; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:4px; }
+.nav-card-value{ font-size:15px; color:#111827; line-height:1.5; font-weight:700; }
+.nav-display.state-waiting { background: linear-gradient(135deg,#faf5ff,#f3ebff) !important; border: 2px solid #9f7aea !important; box-shadow: 0 8px 24px rgba(159,122,234,0.2) !important; }
+.nav-display.state-waiting .nav-card{ border-color:rgba(159,122,234,0.2); }
+.nav-display.state-waiting .nav-card-title{ color:#6b46c1; }
+.nav-display.state-waiting .nav-progress{ color:#9f7aea; }
+.nav-display.state-waiting .nav-mode-pill{ border-color:#d8b4fe; color:#7c3aed; }
+
+#timer { font-size: 48px; text-align: center; font-weight: bold; color: #2d3748; margin: 10px 0; font-variant-numeric: tabular-nums; }
+#waitBadge {
+    display: none;
+    text-align: center;
+    font-weight: bold;
+    color: #9f7aea;
+    background: #f3e8ff;
+    padding: 5px 14px;
+    border-radius: 20px;
+    width: fit-content;
+    margin: 0 auto 10px auto;
+    font-size: 13px;
+    animation: waitPulse 1.6s ease-in-out infinite;
+}
+.reminder-banner {
+    display: none;
+    text-align: center;
+    font-size: 12.5px;
+    font-weight: bold;
+    color: #c2410c;
+    background: #fff7ed;
+    border: 1px solid #fdba74;
+    border-radius: 10px;
+    padding: 8px 10px;
+    margin: 0 auto 10px auto;
+    line-height: 1.4;
+}
+.reminder-banner.show { display: block; }
+@keyframes waitPulse{
+    0%,100%{ opacity:1; }
+    50%{ opacity:.55; }
+}
+.paused-banner { display: none; background: #fffaf0; color: #dd6b20; border: 1px solid #fbd38d; text-align: center; padding: 10px; border-radius: 8px; font-size: 13px; margin-bottom: 15px; }
+.paused-banner.show { display: block; }
+
+/* ===== 操作ボタン ===== */
+button.mainbtn { width: 100%; padding: 15px; font-size: 16px; font-weight: bold; border: none; border-radius: 12px; color: #fff; cursor: pointer; margin-bottom: 10px; box-shadow: 0 3px 8px rgba(0,0,0,0.12); transition: transform .08s; min-height: 48px; }
+button.mainbtn:active{ transform: scale(0.98); }
+button.mainbtn:disabled { background: #cbd5e0 !important; color: #a0aec0; cursor: not-allowed; box-shadow:none; }
+button.mainbtn.action-go { background: linear-gradient(135deg,#3182ce,#2b6cb0); }
+button.mainbtn.action-arrival { background: linear-gradient(135deg,#9f7aea,#805ad5); }
+button.mainbtn.finish { background: #e53e3e; }
+button.mainbtn.pause { background: #ed8936; }
+button.mainbtn.pause.active { background: #38a169; }
+button.mainbtn.undo { background: #fff; color: #c0392b; border: 2px solid #c0392b; display: none; box-shadow:none; }
+button.mainbtn.undo.show { display: block; }
+
+/* ===== 履歴カード ===== */
+.record { background: #fff; margin-top: 12px; padding: 14px; border-radius: 10px; border-left: 5px solid #4299e1; box-shadow: 0 2px 4px rgba(0,0,0,0.04); font-size: 14px; line-height: 1.5; }
+.record .record-icon{ font-size:17px; margin-right:4px; }
+.record .record-route{ font-weight:bold; }
+.record .record-meta{ color:#718096; font-size:12.5px; margin-top:2px; }
+.record .record-duration{ color:#2d3748; }
+.record .history-actions{ margin-top:8px; display:flex; gap:8px; }
+.record .history-edit-btn{ border:none; background:#eef2ff; color:#4338ca; padding:6px 10px; border-radius:8px; font-size:12px; cursor:pointer; }
+.time-editor{ margin-top:8px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:10px; }
+.time-editor .time-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px; font-size:12px; color:#475569; }
+.time-editor input[type="range"]{ width:100%; accent-color:#4338ca; }
+.time-editor .time-value{ font-weight:bold; color:#111827; }
+.time-editor .time-actions{ display:flex; gap:8px; margin-top:6px; }
+.time-editor button{ flex:1; border:none; border-radius:8px; padding:8px; font-size:12px; cursor:pointer; }
+.time-editor .save-btn{ background:#4338ca; color:#fff; }
+.time-editor .cancel-btn{ background:#e2e8f0; color:#334155; }
+.record.type-wait { border-left-color: #9f7aea !important; background: #faf5ff; }
+.record.type-posture-change { border-left-color: #ed8936 !important; background: #fffaf0; }
+#status { text-align: center; font-size: 13px; color: #718096; margin-top: 8px; min-height: 16px; font-weight: bold; }
+</style>
+
+</head>
+<body>
+
+<h2>移動記録ナビシステム</h2>
+
+<div id="resumeBanner" class="resume-banner">
+  <p>前回、終了せずに終わった記録があります。続きから再開しますか?</p>
+  <button class="resume-yes">再開する</button>
+  <button class="resume-no">破棄する</button>
+</div>
+
+<h3>📋 事前ルート設定</h3>
+<div class="route-builder-box">
+    <label>名前 <span style="color:#e53e3e;">*</span></label>
+    <input type="text" id="name" placeholder="例：山田太郎" value="">
+
+    <label>方向（切り替え時に経由地も含めて完全に自動反転します）</label>
+    <div class="chip-group" id="directionGroup">
+      <div class="chip selected" data-value="行き" onclick="toggleDirectionDirect('行き')">行き（大学へ）</div>
+      <div class="chip" data-value="帰り" onclick="handleDirectionChange('帰り')">帰り（自宅へ）</div>
+    </div>
+
+    <label style="margin-top:20px;">ルート構築タイムライン</label>
+    <div id="routeNodesContainer">
+        </div>
+    
+    <div class="builder-actions">
+        <button type="button" onclick="addRouteNode()">➕ 途中の場所を追加</button>
+        <button type="button" id="btnLockRoute" onclick="lockAndPrepareRoute()">ルートを確定して準備</button>
+    </div>
+</div>
+
+<h3>🚦 ナビゲーション画面</h3>
+<div id="navDisplay" class="nav-display" style="display:none;">
+    <div id="navIcon" class="nav-icon">🚦</div>
+    <div id="navProgress" class="nav-progress"></div>
+    <div id="navModeBadge" class="nav-mode-pill">次の移動: —</div>
+    <div class="nav-grid">
+        <div class="nav-card">
+            <div class="nav-card-title">現在</div>
+            <div id="navStatus" class="nav-card-value">ルート未確定</div>
+        </div>
+        <div class="nav-card">
+            <div class="nav-card-title">次の場所</div>
+            <div id="navNext" class="nav-card-value"></div>
+        </div>
+        <div class="nav-card">
+            <div class="nav-card-title">目的</div>
+            <div id="navAction" class="nav-card-value"></div>
+        </div>
+    </div>
+</div>
+
+<div class="posture-selector-box" id="postureSelectorContainer" style="display:none;">
+    <div class="posture-title" id="postureBoxTitle">🧍 現在の姿勢を選択してください <span style="color:#e53e3e;">*</span></div>
+    <select id="activePostureSelect" onchange="handleLivePostureChange(this.value)">
+        <option value="" disabled selected>-- 選択してください --</option>
+        <option value="座る">🪑 座る</option>
+        <option value="立つ">🧍 立つ</option>
+    </select>
+</div>
+
+<div id="timer">00:00:00</div>
+<div id="waitBadge">⚠️ 乗り換え待機 計測中 ⚠️</div>
+<div id="reminderBanner" class="reminder-banner"></div>
+<div id="pausedBanner" class="paused-banner">🚏 一時停止中（寄り道など）</div>
+
+<button class="mainbtn" id="primaryActionBtn" onclick="handlePrimaryAction()" disabled>上部でルートを確定してください</button>
+<button class="mainbtn pause" id="pauseBtn" onclick="togglePause()" disabled>一時停止（寄り道）</button>
+<button class="mainbtn finish" id="finishBtn" onclick="finishAll()" disabled>全行程終了</button>
+<button class="mainbtn undo" id="undoBtn" onclick="undoLast()">直前の記録を取り消す</button>
+
+<div id="status"></div>
+
+<h3>履歴</h3>
+<div id="history"></div>
+
+<script>
+const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbw_UjIsOSWQNqRqmCLyiz5ljG1ZXY6apX1AVKsY4LopRP9Qom5rPBDadWt9eK-dhBhd/exec";
+const SESSION_KEY = "idoukeiro_session_v5";
+const PRESET_ROUTE_KEY = "idoukeiro_preset_route_v5";
+
+let totalStart=null;
+let sectionStart=null;
+let timerID=null;
+let running=false;
+let isPaused=false;
+let pauseStartTime=null;
+let records=[];
+let lastReminderTime = null;
+let reminderTimerID = null;
+let reminderShown = false;
+
+let compiledRoute = []; 
+let currentStepIndex = 0; 
+let currentAppState = "READY"; 
+let lastAction=null; 
+
+let lastSelectedPostureValue = "";
+
+window.addEventListener("DOMContentLoaded", function(){
+    const savedPreset = localStorage.getItem(PRESET_ROUTE_KEY);
+    if (savedPreset) {
+        try {
+            restoreRouteFromStorage(JSON.parse(savedPreset));
+        } catch(e) {
+            buildDefaultInitialRoute("行き");
+        }
+    } else {
+        buildDefaultInitialRoute("行き");
+    }
+
+    const savedName = localStorage.getItem("idoukeiro_name_v5");
+    if(savedName) document.getElementById("name").value = savedName;
+
+    const savedSession = localStorage.getItem(SESSION_KEY);
+    if(savedSession){
+        try{
+            showResumeBanner(JSON.parse(savedSession));
+        }catch(e){
+            localStorage.removeItem(SESSION_KEY);
+        }
+    }
+});
+
+function buildDefaultInitialRoute(direction) {
+    const container = document.getElementById("routeNodesContainer");
+    container.innerHTML = ""; 
+    if (direction === "行き") {
+        addRouteNode("自宅", "徒歩", "🛫 出発地");
+        addRouteNode("神奈川工科大学", "終了", "🏁 最終目的地");
+    } else {
+        addRouteNode("神奈川工科大学", "徒歩", "🛫 出発地");
+        addRouteNode("自宅", "終了", "🏁 最終目的地");
+    }
+}
+
+function restoreRouteFromStorage(routeData) {
+    const container = document.getElementById("routeNodesContainer");
+    container.innerHTML = "";
+    if(routeData.direction) {
+        document.querySelectorAll("#directionGroup .chip").forEach(c => {
+            if(c.dataset.value === routeData.direction) c.classList.add("selected");
+            else c.classList.remove("selected");
+        });
+    }
+    routeData.nodes.forEach((item, idx) => {
+        let label = "経由地";
+        if(idx === 0) label = "🛫 出発地";
+        if(idx === routeData.nodes.length - 1) label = "🏁 最終目的地";
+        addRouteNode(item.place, item.mode, label);
+    });
+}
+
+function toggleDirectionDirect(targetDirection) {
+    const group = document.getElementById("directionGroup");
+    const currentSelected = group.querySelector(".chip.selected").dataset.value;
+    if(currentSelected === targetDirection) return;
+
+    group.querySelectorAll(".chip").forEach(c => {
+        if(c.dataset.value === targetDirection) c.classList.add("selected");
+        else c.classList.remove("selected");
+    });
+
+    const nodeElements = Array.from(document.querySelectorAll("#routeNodesContainer .route-node"));
+    const originalList = nodeElements.map(node => {
+        const place = node.querySelector(".node-place").value.trim();
+        return { place };
+    });
+
+    const originalSegments = [];
+    for (let i = 1; i < nodeElements.length; i++) {
+        const modeSelect = nodeElements[i].querySelector(".node-mode");
+        originalSegments.push(modeSelect ? modeSelect.value : "徒歩");
+    }
+
+    const mirroredPlaces = originalList.slice().reverse().map(item => item.place);
+
+    const container = document.getElementById("routeNodesContainer");
+    container.innerHTML = "";
+    mirroredPlaces.forEach((place, idx) => {
+        let label = "経由地";
+        if(idx === 0) label = "🛫 出発地";
+        if(idx === mirroredPlaces.length - 1) label = "🏁 最終目的地";
+        const modeValue = idx === 0
+            ? "徒歩"
+            : originalSegments[originalSegments.length - idx] || "徒歩";
+        addRouteNode(place, modeValue, label);
+    });
+
+    if(running) syncRouteOnTheFly();
+    else saveRouteToLocalStorage();
+}
+
+function handleDirectionChange(value) {
+    toggleDirectionDirect(value);
+}
+
+function addRouteNode(placeValue = "", modeValue = "徒歩", customLabel = "") {
+    const container = document.getElementById("routeNodesContainer");
+    const node = document.createElement("div");
+    node.className = "route-node";
+    let labelText = customLabel || `経由地`;
+    let linkUiHtml = "";
+    
+    if (container.children.length > 0) {
+        const modes=[
+            {v:"徒歩",i:"🚶"},{v:"電車",i:"🚃"},{v:"バス",i:"🚌"},
+            {v:"バイク",i:"🏍️"},{v:"自転車",i:"🚲"},{v:"自動車",i:"🚗"}
+        ];
+        const optionsHtml = modes.map(m=>
+            `<option value="${m.v}" ${modeValue===m.v ? 'selected' : ''}>${m.i} ${m.v}</option>`
+        ).join("");
+        linkUiHtml = `
+        <div class="route-link-ui">
+            <div class="link-label">↓ 次の場所への移動手段:</div>
+            <select class="node-mode" onchange="syncRouteOnTheFly();">
+                ${optionsHtml}
+            </select>
+        </div>`;
+    }
+
+    node.innerHTML = `
+        ${linkUiHtml}
+        <div class="node-header">
+            <span class="node-label"><b>${labelText}</b> 📍</span>
+            <button type="button" class="remove-node-btn" onclick="removeNode(this)">✕ 削除</button>
+        </div>
+        <input type="text" class="node-place" placeholder="場所名を入力" value="${placeValue}" oninput="syncRouteOnTheFly();">
+    `;
+    
+    if (container.children.length >= 2 && !customLabel) {
+        container.insertBefore(node, container.lastChild);
+    } else {
+        container.appendChild(node);
+    }
+    
+    reindexLabels();
+    if (running) syncRouteOnTheFly();
+    else saveRouteToLocalStorage();
+}
+
+function removeNode(button) {
+    const container = document.getElementById("routeNodesContainer");
+    if (container.children.length <= 2) {
+        alert("出発地と目的地は削除できません。");
+        return;
+    }
+    button.closest('.route-node').remove();
+    reindexLabels();
+    if (running) syncRouteOnTheFly();
+    else saveRouteToLocalStorage();
+}
+
+function reindexLabels() {
+    const nodes = document.querySelectorAll("#routeNodesContainer .route-node");
+    nodes.forEach((node, idx) => {
+        node.classList.remove("start-node", "end-node");
+        const label = node.querySelector(".node-label b");
+        if (idx === 0) {
+            node.classList.add("start-node");
+            label.textContent = "🛫 出発地";
+        } else if (idx === nodes.length - 1) {
+            node.classList.add("end-node");
+            label.textContent = "🏁 最終目的地"; 
+        } else {
+            label.textContent = `経由地 (${idx})`;
+        }
+    });
+}
+
+function saveRouteToLocalStorage() {
+    const direction = document.querySelector("#directionGroup .chip.selected").dataset.value;
+    const nodes = document.querySelectorAll("#routeNodesContainer .route-node");
+    let routeData = { direction: direction, nodes: [] };
+    nodes.forEach(node => {
+        const place = node.querySelector(".node-place").value.trim();
+        const modeSelect = node.querySelector(".node-mode");
+        routeData.nodes.push({ place: place, mode: modeSelect ? modeSelect.value : "終了" });
+    });
+    localStorage.setItem(PRESET_ROUTE_KEY, JSON.stringify(routeData));
+}
+
+function syncRouteOnTheFly() {
+    const nodeElements = document.querySelectorAll("#routeNodesContainer .route-node");
+    let newRoute = [];
+    for (let i = 0; i < nodeElements.length; i++) {
+        const place = nodeElements[i].querySelector(".node-place").value.trim();
+        let nextMode = "終了";
+        if (i < nodeElements.length - 1) {
+            nextMode = nodeElements[i + 1].querySelector(".node-mode").value;
+        }
+        newRoute.push({ place: place, nextMode: nextMode });
+    }
+    compiledRoute = newRoute;
+    
+    updateNavigationDisplay();
+    if (running && currentAppState === "WAITING") {
+        setupPrimaryButton("go", `🚀 次の場所へ進む (${compiledRoute[currentStepIndex].nextMode} が発車・出発)`);
+    }
+    saveRouteToLocalStorage();
+}
+
+// 徒歩・自転車・自動車は、乗り物の発車を待つ必要がないため「待ち時間」の選択肢を出さない
+// （電車・バスのように、乗り換え先の発車を待つ手段でのみ「待ち時間」状態を挟む）
+function legHasWaiting(mode){
+    return mode === "電車" || mode === "バス";
+}
+
+function markError(el){ el.classList.add("input-error"); }
+function clearError(el){ el.classList.remove("input-error"); }
+
+document.getElementById("name").addEventListener("input", function(){ clearError(this); });
+
+// 移動手段のセレクト変更を一括で処理（ノードは動的に追加されるため委譲イベントで対応）
+document.getElementById("routeNodesContainer").addEventListener("change", function(e){
+    if(!e.target.classList.contains("node-mode")) return;
+    syncRouteOnTheFly();
+});
+
+function lockAndPrepareRoute() {
+    const nameEl = document.getElementById("name");
+    clearError(nameEl);
+    const name = nameEl.value.trim();
+    if (!name) { 
+        markError(nameEl);
+        document.getElementById("status").textContent = "名前を入力してください";
+        return; 
+    }
+    localStorage.setItem("idoukeiro_name_v5", name);
+    ensureNotificationPermission();
+
+    syncRouteOnTheFly();
+
+    currentStepIndex = 0;
+    currentAppState = "READY";
+
+    document.getElementById("navDisplay").style.display = "block";
+    const pBtn = document.getElementById("primaryActionBtn");
+    pBtn.disabled = false;
+    pBtn.className = "mainbtn action-go";
+    pBtn.textContent = `▶ 計測スタート (${compiledRoute[0].place} を出発)`;
+    
+    document.getElementById("status").textContent = "ルートを確定保存しました。";
+    updateNavigationDisplay();
+}
+
+function ensureNotificationPermission() {
+    return false;
+}
+
+function showNavigationNotification(customBody) {
+    return;
+}
+
+function syncPostureSelectorUI() {
+    const postureSelectEl = document.getElementById("activePostureSelect");
+    const postureContainer = document.getElementById("postureSelectorContainer");
+    const postureTitle = document.getElementById("postureBoxTitle");
+    const currentStep = compiledRoute[currentStepIndex];
+    const fixedSeatedModes = ["バイク", "自動車", "自転車"];
+    const isWalkingMove = currentAppState === "MOVING" && currentStep && currentStep.nextMode === "徒歩";
+    const isFixedSeatedMove = currentAppState === "MOVING" && currentStep && fixedSeatedModes.includes(currentStep.nextMode);
+
+    if (currentAppState === "MOVING" && isWalkingMove) {
+        postureSelectEl.value = "立つ";
+        postureSelectEl.disabled = true;
+        postureTitle.textContent = "🧍 徒歩中は姿勢を自動で「立つ」に設定しています";
+        postureContainer.style.display = "block";
+        return;
+    }
+
+    if (currentAppState === "MOVING" && isFixedSeatedMove) {
+        postureSelectEl.value = "座る";
+        postureSelectEl.disabled = true;
+        postureTitle.textContent = "🪑 バイク・自動車・自転車では姿勢を自動で「座る」に固定します";
+        postureContainer.style.display = "block";
+        return;
+    }
+
+    if (currentAppState === "MOVING" || currentAppState === "WAITING") {
+        postureSelectEl.disabled = false;
+        postureTitle.textContent = currentAppState === "WAITING"
+            ? "🧍 現在の乗り換え待機中の姿勢を選択してください:"
+            : "🧍 現在の移動中の姿勢を選択してください:";
+        postureContainer.style.display = "block";
+    } else {
+        postureSelectEl.disabled = false;
+        postureContainer.style.display = "none";
+    }
+}
+
+function updateNavigationDisplay() {
+    const navBox = document.getElementById("navDisplay");
+    const iconEl = document.getElementById("navIcon");
+    const progressEl = document.getElementById("navProgress");
+    const modeBadgeEl = document.getElementById("navModeBadge");
+    const statusEl = document.getElementById("navStatus");
+    const nextEl = document.getElementById("navNext");
+    const actionEl = document.getElementById("navAction");
+    const waitBadge = document.getElementById("waitBadge");
+    const current = compiledRoute[currentStepIndex];
+
+    const modeIcons = { "徒歩":"🚶","電車":"🚃","バス":"🚌","バイク":"🏍️","自転車":"🚲","自動車":"🚗" };
+
+    navBox.classList.remove("state-waiting");
+    waitBadge.style.display = "none";
+    progressEl.textContent = `STEP ${currentStepIndex + 1} / ${compiledRoute.length}`;
+
+    syncPostureSelectorUI();
+
+    const nextMode = current ? current.nextMode : null;
+    const nextDestination = compiledRoute[currentStepIndex + 1];
+    if (modeBadgeEl) {
+        if (currentAppState === "FINISHED") {
+            modeBadgeEl.style.display = "none";
+        } else if (nextMode) {
+            modeBadgeEl.style.display = "inline-flex";
+            modeBadgeEl.textContent = `次の移動: ${modeIcons[nextMode] || "🚦"} ${nextMode}`;
+        } else {
+            modeBadgeEl.style.display = "none";
+        }
+    }
+
+    if (currentAppState === "READY") {
+        iconEl.textContent = modeIcons[current ? current.nextMode : "🚦"] || "🚦";
+        statusEl.textContent = `待機中: ${current ? current.place : "未設定"}`;
+        nextEl.textContent = current ? `${current.nextMode}で${compiledRoute[currentStepIndex + 1]?.place || "目的地"}へ` : "ルートを設定してください";
+        actionEl.textContent = `「スタート」を押すと、${current ? current.place : "出発地"} から計測を開始します。`;
+    } else if (currentAppState === "MOVING") {
+        const destination = compiledRoute[currentStepIndex + 1];
+        iconEl.textContent = modeIcons[current.nextMode] || "🚚";
+        statusEl.textContent = `移動中：${current.nextMode}`;
+        nextEl.textContent = destination ? destination.place : "目的地";
+        actionEl.textContent = `${destination ? destination.place : "目的地"}に着いたら「到着した」を押してください`;
+    } else if (currentAppState === "WAITING") {
+        const showTransferWaiting = current && legHasWaiting(current.nextMode);
+        navBox.classList.add("state-waiting");
+        waitBadge.style.display = "block";
+        waitBadge.textContent = showTransferWaiting ? "⚠️ 乗り換え待機 計測中 ⚠️" : "⚠️ 待機中 ⚠️";
+        iconEl.textContent = showTransferWaiting ? "⏱" : "⏳";
+        statusEl.textContent = showTransferWaiting ? `乗り換え待機` : `待機中`;
+        nextEl.textContent = current ? current.place : "待機場所";
+        const waitingHint = showTransferWaiting
+            ? "駅に着いて、発車したら下のボタンを押してください。"
+            : "発車したら下のボタンを押してください。";
+        actionEl.textContent = waitingHint;
+    } else if (currentAppState === "FINISHED") {
+        iconEl.textContent = "🏁";
+        progressEl.textContent = "完了";
+        statusEl.textContent = `🏁 全行程終了`;
+        nextEl.textContent = `すべての記録が完了しました`;
+        actionEl.textContent = `再度開始する場合は上部からルートを確定してください。`;
+    }
+}
+
+// ★【姿勢変更のミラーリング・タイムスタンプ分割の完全バグ修正】
+function handleLivePostureChange(newPosture) {
+    if (!running || isPaused || !newPosture) return;
+    const now = new Date();
+    const direction = document.querySelector("#directionGroup .chip.selected").dataset.value;
+    const currentPlace = compiledRoute[currentStepIndex];
+    
+    let currentTransportMode = "待ち";
+    if (currentAppState === "MOVING") {
+        currentTransportMode = currentPlace.nextMode;
+    }
+
+    // もしすでにこれまでの姿勢がセットされていた場合（＝最初の空欄から変更された時）
+    // 前回の確定（あるいは乗車開始）から、この姿勢変更の瞬間までの「前半戦区間」を1行として切り出し送信
+    if(lastSelectedPostureValue !== "") {
+        const record = {
+            id: makeId(),
+            name: document.getElementById("name").value,
+            direction: direction,
+            from: currentAppState === "MOVING" ? currentPlace.place : "待ち状態",
+            to: currentAppState === "MOVING" ? compiledRoute[currentStepIndex + 1].place : currentPlace.place,
+            transport: currentTransportMode, 
+            posture: lastSelectedPostureValue, // これまで維持していた方の姿勢でログを確定
+            startDate: sectionStart,           // 区間開始から
+            endDate: now                      // 変更した今の瞬間まで
+        };
+        
+        sendRecordToGAS(record, "create");
+        saveHistory(record);
+        records.unshift(record);
+    }
+    
+    // ★重要：次の姿勢変化、あるいは「駅到着」に備えて、今の瞬間を次のセクションの「開始時刻」にリセット
+    sectionStart = now;
+    lastSelectedPostureValue = newPosture;
+    saveSession();
+}
+
+function showReminderBanner(message) {
+    const banner = document.getElementById("reminderBanner");
+    if (!banner) return;
+    banner.textContent = message;
+    banner.classList.add("show");
+}
+
+function hideReminderBanner() {
+    const banner = document.getElementById("reminderBanner");
+    if (!banner) return;
+    banner.textContent = "";
+    banner.classList.remove("show");
+}
+
+function resetPendingActionReminder() {
+    if (reminderTimerID) {
+        clearInterval(reminderTimerID);
+        reminderTimerID = null;
+    }
+    lastReminderTime = null;
+    reminderShown = false;
+    hideReminderBanner();
+}
+
+function checkPendingActionReminder() {
+    return;
+}
+
+function handlePrimaryAction() {
+    if (isPaused) return;
+    const now = new Date();
+    const direction = document.querySelector("#directionGroup .chip.selected").dataset.value;
+    
+    const postureSelectEl = document.getElementById("activePostureSelect");
+    clearError(postureSelectEl);
+    const selectedPosture = postureSelectEl.value;
+    
+    if(!selectedPosture && currentAppState !== "READY") {
+        markError(postureSelectEl);
+        alert("現在の姿勢（座る・立つ）を選択してください。");
+        return;
+    }
+
+    const prevState = {
+        currentStepIndex: currentStepIndex,
+        currentAppState: currentAppState,
+        sectionStart: sectionStart
+    };
+
+    // ★多重タイマー競合バグの防止：インターバルを一度確実に破棄
+    if(timerID) { clearInterval(timerID); timerID = null; }
+
+    if (currentAppState === "READY") {
+        running = true;
+        totalStart = now;
+        sectionStart = now;
+        // ※タイマーはこの関数の末尾でrunning=trueの場合にまとめて1つだけ開始する（二重生成を防止）
+
+        togglePauseButton(true);
+        document.getElementById("finishBtn").disabled = false;
+        hideUndo();
+        
+        postureSelectEl.value = "";
+        lastSelectedPostureValue = "";
+
+        // 出発時は待ち時間を挟まず、すぐに移動計測を開始する
+        currentAppState = "MOVING";
+        const nextTarget = compiledRoute[currentStepIndex + 1];
+        setupPrimaryButton("arrival", `📍 ${nextTarget.place} に到着した`);
+        
+    } else if (currentAppState === "MOVING") {
+        const currentOrigin = compiledRoute[currentStepIndex];
+        const currentDest = compiledRoute[currentStepIndex + 1];
+        
+        const record = {
+            id: makeId(),
+            name: document.getElementById("name").value,
+            direction: direction,
+            from: currentOrigin.place,
+            to: currentDest.place,
+            transport: currentOrigin.nextMode,
+            posture: selectedPosture,
+            startDate: sectionStart,
+            endDate: now,
+            isWait: false
+        };
+        
+        sendRecordToGAS(record, "create");
+        saveHistory(record);
+        records.unshift(record);
+        
+        lastAction = { type: "section", record: record, prevState: prevState };
+        showUndo();
+
+        currentStepIndex++;
+        sectionStart = now;
+        
+        if (compiledRoute[currentStepIndex].nextMode === "終了") {
+            currentAppState = "FINISHED";
+            finishAll();
+            return;
+        } else if (legHasWaiting(compiledRoute[currentStepIndex].nextMode)) {
+            currentAppState = "WAITING";
+            postureSelectEl.value = "";
+            lastSelectedPostureValue = "";
+            setupPrimaryButton("go", `🚀 次の移動を開始 (${compiledRoute[currentStepIndex].nextMode} が発車・出発)`);
+        } else {
+            // 徒歩・自転車・自動車は待ち時間を挟まず、そのまま次の区間の移動を開始する
+            currentAppState = "MOVING";
+            postureSelectEl.value = "";
+            lastSelectedPostureValue = "";
+            const nextTargetNoWait = compiledRoute[currentStepIndex + 1];
+            setupPrimaryButton("arrival", `📍 ${nextTargetNoWait.place} に到着した`);
+        }
+        
+    } else if (currentAppState === "WAITING") {
+        const currentPlace = compiledRoute[currentStepIndex];
+        
+        const record = {
+            id: makeId(),
+            name: document.getElementById("name").value,
+            direction: direction,
+            from: currentPlace.place,
+            to: currentPlace.place,
+            transport: "待ち",
+            posture: selectedPosture,
+            startDate: sectionStart,
+            endDate: now,
+            isWait: true
+        };
+        
+        sendRecordToGAS(record, "create");
+        saveHistory(record);
+        records.unshift(record);
+        
+        lastAction = { type: "section", record: record, prevState: prevState };
+        showUndo();
+
+        sectionStart = now;
+        currentAppState = "MOVING";
+        
+        postureSelectEl.value = "";
+        lastSelectedPostureValue = "";
+        
+        const nextTarget = compiledRoute[currentStepIndex + 1];
+        setupPrimaryButton("arrival", `📍 ${nextTarget.place} に到着した`);
+    }
+    
+    // スレッドが生きている場合はタイマー更新を再スタート
+    if(running) { timerID = setInterval(() => { document.getElementById("timer").innerHTML = format(new Date() - totalStart); }, 1000); }
+    updateNavigationDisplay();
+    saveSession();
+}
+
+function setupPrimaryButton(type, text) {
+    const pBtn = document.getElementById("primaryActionBtn");
+    pBtn.className = `mainbtn action-${type}`;
+    pBtn.textContent = text;
+}
+
+function showUndo(){ document.getElementById("undoBtn").classList.add("show"); }
+function hideUndo(){ document.getElementById("undoBtn").classList.remove("show"); lastAction=null; }
+
+function undoLast(){
+    if(!lastAction) return;
+    const historyEl = document.getElementById("history");
+    if(historyEl.firstChild) historyEl.removeChild(historyEl.firstChild);
+
+    const idx = records.findIndex(r => r.id === lastAction.record.id);
+    if(idx > -1) records.splice(idx, 1);
+
+    sendUndoToGAS(lastAction.record);
+
+    if(timerID) { clearInterval(timerID); timerID = null; }
+
+    const prev = lastAction.prevState;
+    if (lastAction.type === "finish") {
+        running = true;
+        totalStart = prev.totalStart;
+        sectionStart = prev.sectionStart;
+        currentStepIndex = prev.currentStepIndex;
+        currentAppState = prev.currentAppState;
+        togglePauseButton(true);
+        document.getElementById("finishBtn").disabled = false;
+        document.getElementById("primaryActionBtn").disabled = false;
+    } else {
+        currentStepIndex = prev.currentStepIndex;
+        currentAppState = prev.currentAppState;
+        sectionStart = prev.sectionStart;
+    }
+
+    if(running) { timerID = setInterval(() => { document.getElementById("timer").innerHTML = format(new Date() - totalStart); }, 1000); }
+
+    if (currentAppState === "MOVING") {
+        const nextTarget = compiledRoute[currentStepIndex + 1];
+        setupPrimaryButton("arrival", `📍 ${nextTarget.place} に到着した`);
+    } else if (currentAppState === "WAITING") {
+        setupPrimaryButton("go", `🚀 次の移動を開始 (${compiledRoute[currentStepIndex].nextMode} が発車・出発)`);
+    }
+
+    document.getElementById("status").textContent = "直前の区間記録を取り消しました。";
+    updateNavigationDisplay();
+    hideUndo();
+    saveSession();
+}
+
+function finishAll() {
+    if (isPaused) return;
+    const direction = document.querySelector("#directionGroup .chip.selected").dataset.value;
+    const selectedPosture = document.getElementById("activePostureSelect").value;
+    const now = new Date();
+    
+    const prevState = {
+        totalStart: totalStart,
+        sectionStart: sectionStart,
+        currentStepIndex: currentStepIndex,
+        currentAppState: currentAppState
+    };
+
+    if (currentAppState === "MOVING" && currentStepIndex < compiledRoute.length - 1) {
+        if(!selectedPosture) {
+            alert("現在の姿勢（座る・立つ）を選択してください。");
+            return;
+        }
+        const currentOrigin = compiledRoute[currentStepIndex];
+        const currentDest = compiledRoute[currentStepIndex + 1];
+        const record = {
+            id: makeId(),
+            name: document.getElementById("name").value,
+            direction: direction,
+            from: currentOrigin.place,
+            to: currentDest.place,
+            transport: currentOrigin.nextMode,
+            posture: selectedPosture,
+            startDate: sectionStart,
+            endDate: now,
+            isWait: false
+        };
+        sendRecordToGAS(record, "create");
+        saveHistory(record);
+        records.unshift(record);
+        lastAction = { type: "finish", record: record, prevState: prevState };
+    }
+
+    // ★【バグ修正：タイマーIDを100%確実に停止・抹消する】
+    if (timerID) {
+        clearInterval(timerID);
+        timerID = null;
+    }
+    if (reminderTimerID) {
+        clearInterval(reminderTimerID);
+        reminderTimerID = null;
+    }
+    hideReminderBanner();
+    
+    // ★ 画面上の表示を完全に「00:00:00」に書き換えてロック停止させる
+    document.getElementById("timer").innerHTML = "00:00:00";
+    
+    running = false;
+    currentAppState = "FINISHED";
+    
+    togglePauseButton(false);
+    document.getElementById("finishBtn").disabled = true;
+    
+    const pBtn = document.getElementById("primaryActionBtn");
+    pBtn.disabled = true;
+    pBtn.className = "mainbtn";
+    pBtn.textContent = "全行程の計測完了（上のボタンから再スタート可能）";
+    
+    showUndo();
+    updateNavigationDisplay();
+    clearSession();
+    alert("すべての移動記録を終了しました。");
+}
+
+function togglePauseButton(enable){
+    const btn=document.getElementById("pauseBtn");
+    btn.disabled=!enable;
+    if(!enable){
+        btn.textContent="一時停止（寄り道）";
+        btn.classList.remove("active");
+        document.getElementById("pausedBanner").classList.remove("show");
+    }
+}
+
+function togglePause(){
+    if(!running) return;
+    if(!isPaused){
+        isPaused=true;
+        pauseStartTime=new Date();
+        if(timerID) { clearInterval(timerID); timerID = null; }
+        if(reminderTimerID) { clearInterval(reminderTimerID); reminderTimerID = null; }
+        document.getElementById("pauseBtn").textContent="再開する";
+        document.getElementById("pauseBtn").classList.add("active");
+        document.getElementById("pausedBanner").classList.add("show");
+        document.getElementById("primaryActionBtn").disabled = true;
+        document.getElementById("navAction").textContent = "一時停止中です。寄り道や遊びが終わったら、再開するを押してから、到着した・次の移動を開始してください。";
+    } else {
+        const now=new Date();
+        const pausedDuration=now-pauseStartTime;
+        totalStart=new Date(totalStart.getTime()+pausedDuration);
+        sectionStart=new Date(sectionStart.getTime()+pausedDuration);
+        isPaused=false;
+        pauseStartTime=null;
+        document.getElementById("pauseBtn").textContent="一時停止（寄り道）";
+        document.getElementById("pauseBtn").classList.remove("active");
+        document.getElementById("pausedBanner").classList.remove("show");
+        document.getElementById("primaryActionBtn").disabled = false;
+        document.getElementById("navAction").textContent = "寄り道や遊びが終わったら、再開してから到着した・次の移動を開始してください。";
+        timerID=setInterval(function(){ document.getElementById("timer").innerHTML=format(new Date()-totalStart); },1000);
+        resetPendingActionReminder();
+    }
+    saveSession();
+}
+
+function saveSession(){
+    if(!running){ clearSession(); return; }
+    const state = {
+        totalStart: totalStart.toISOString(),
+        sectionStart: sectionStart.toISOString(),
+        currentStepIndex: currentStepIndex,
+        currentAppState: currentAppState,
+        isPaused: isPaused,
+        pauseStartTime: pauseStartTime ? pauseStartTime.toISOString() : null,
+        records: records.map(r=>({
+            id:r.id, name:r.name, direction:r.direction, from:r.from, to:r.to,
+            transport:r.transport, posture:r.posture,
+            startDate:r.startDate.toISOString(), endDate:r.endDate.toISOString(), isWait:r.isWait
+        }))
+    };
+    localStorage.setItem(SESSION_KEY, JSON.stringify(state));
+}
+function clearSession(){ localStorage.removeItem(SESSION_KEY); }
+
+function showResumeBanner(state){
+    const banner=document.getElementById("resumeBanner");
+    banner.classList.add("show");
+    banner.querySelector(".resume-yes").onclick=()=>{ resumeSession(state); banner.classList.remove("show"); };
+    banner.querySelector(".resume-no").onclick=()=>{ clearSession(); banner.classList.remove("show"); };
+}
+
+function resumeSession(state){
+    running=true;
+    totalStart=new Date(state.totalStart);
+    sectionStart=new Date(state.sectionStart);
+    currentStepIndex=state.currentStepIndex;
+    currentAppState=state.currentAppState;
+    isPaused=state.isPaused;
+    pauseStartTime=state.pauseStartTime ? new Date(state.pauseStartTime) : null;
+
+    records=(state.records||[]).map(r=>({
+        id:r.id, name:r.name, direction:r.direction, from:r.from, to:r.to,
+        transport:r.transport, posture:r.posture,
+        startDate:new Date(r.startDate), endDate:new Date(r.endDate), isWait:r.isWait
+    }));
+
+    document.getElementById("history").innerHTML="";
+    renderHistory();
+
+    document.getElementById("navDisplay").style.display = "block";
+    togglePauseButton(true);
+    document.getElementById("finishBtn").disabled = false;
+
+    if(isPaused){
+        document.getElementById("pauseBtn").textContent="再開する";
+        document.getElementById("pauseBtn").classList.add("active");
+        document.getElementById("pausedBanner").classList.add("show");
+        document.getElementById("timer").innerHTML=format((pauseStartTime||new Date())-totalStart);
+    } else {
+        timerID=setInterval(function(){ document.getElementById("timer").innerHTML=format(new Date()-totalStart); },1000);
+    }
+
+    if (currentAppState === "MOVING") {
+        const nextTarget = compiledRoute[currentStepIndex + 1];
+        setupPrimaryButton("arrival", `📍 ${nextTarget.place} に到着した`);
+    } else if (currentAppState === "WAITING") {
+        setupPrimaryButton("go", `🚀 次の場所へ進む (${compiledRoute[currentStepIndex].nextMode} が発車・出発)`);
+    }
+    updateNavigationDisplay();
+}
+
+function format(ms){
+    if(ms<0) ms=0;
+    const sec=Math.floor(ms/1000);
+    const h=String(Math.floor(sec/3600)).padStart(2,"0");
+    const m=String(Math.floor((sec%3600)/60)).padStart(2,"0");
+    const s=String(sec%60).padStart(2,"0");
+    return h+":"+m+":"+s;
+}
+function toLocalTimeString(date){
+    return date.toLocaleTimeString("ja-JP", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+}
+function getDurationSeconds(startDate, endDate){
+    return Math.max(0, Math.floor((endDate.getTime() - startDate.getTime()) / 1000));
+}
+function makeId(){ return "r_"+Date.now()+"_"+Math.random().toString(36).slice(2,8); }
+function esc(s){ const d=document.createElement("div"); d.textContent=(s==null?"":s); return d.innerHTML; }
+
+function sendRecordToGAS(record, action){
+    const statusEl=document.getElementById("status");
+    statusEl.textContent = "データをGASに送信中...";
+    const payload={
+        action:action, id:record.id, name:record.name, direction:record.direction,
+        from:record.from, to:record.to, transport:record.transport, posture:record.posture,
+        start:toLocalTimeString(record.startDate),
+        end:toLocalTimeString(record.endDate),
+        startIso:record.startDate.toISOString(),
+        endIso:record.endDate.toISOString(),
+        startEpochMs:record.startDate.getTime(),
+        endEpochMs:record.endDate.getTime(),
+        duration:format(record.endDate-record.startDate),
+        durationSeconds:getDurationSeconds(record.startDate, record.endDate)
+    };
+    fetch(WEBAPP_URL,{ method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body:JSON.stringify(payload) })
+    .then(()=>{ statusEl.textContent="送信完了（"+new Date().toLocaleTimeString("ja-JP")+"）"; }).catch(err={});
+}
+
+function sendUndoToGAS(record){
+    fetch(WEBAPP_URL,{ method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" }, body:JSON.stringify({ action:"undo", id:record.id }) }).catch(err={});
+}
+
+function renderHistory(){
+    const historyEl=document.getElementById("history");
+    historyEl.innerHTML="";
+    for(let i=records.length-1;i>=0;i--) saveHistory(records[i]);
+}
+
+function formatTimeValue(date){
+    const h=String(date.getHours()).padStart(2,"0");
+    const m=String(date.getMinutes()).padStart(2,"0");
+    const s=String(date.getSeconds()).padStart(2,"0");
+    return `${h}:${m}:${s}`;
+}
+
+function createTimeValueFromMinutes(minutes){
+    const date=new Date();
+    date.setHours(0,0,0,0);
+    date.setMinutes(minutes);
+    return date;
+}
+
+function editHistoryRecord(recordId){
+    const record=records.find(r=>r.id===recordId);
+    if(!record) return;
+
+    const card=document.querySelector(`.record[data-record-id="${recordId}"]`);
+    if(!card) return;
+
+    const startMinutes=record.startDate.getHours()*60 + record.startDate.getMinutes();
+    const endMinutes=record.endDate.getHours()*60 + record.endDate.getMinutes();
+
+    const editor=document.createElement("div");
+    editor.className="time-editor";
+    editor.innerHTML=`
+        <div class="time-row"><span>開始</span><span class="time-value" id="editStartValue">${formatTimeValue(record.startDate)}</span></div>
+        <input type="range" id="editStartSlider" min="0" max="1439" step="1" value="${startMinutes}">
+        <div class="time-row"><span>終了</span><span class="time-value" id="editEndValue">${formatTimeValue(record.endDate)}</span></div>
+        <input type="range" id="editEndSlider" min="0" max="1439" step="1" value="${endMinutes}">
+        <div class="time-actions">
+            <button class="cancel-btn" type="button">キャンセル</button>
+            <button class="save-btn" type="button">保存</button>
+        </div>
+    `;
+
+    const existingEditor=card.querySelector(".time-editor");
+    if(existingEditor) existingEditor.remove();
+
+    card.appendChild(editor);
+
+    const startSlider=editor.querySelector("#editStartSlider");
+    const endSlider=editor.querySelector("#editEndSlider");
+    const startValueEl=editor.querySelector("#editStartValue");
+    const endValueEl=editor.querySelector("#editEndValue");
+
+    const updatePreview=()=>{
+        const startDate=createTimeValueFromMinutes(parseInt(startSlider.value,10));
+        const endDate=createTimeValueFromMinutes(parseInt(endSlider.value,10));
+        startValueEl.textContent=formatTimeValue(startDate);
+        endValueEl.textContent=formatTimeValue(endDate);
+    };
+
+    startSlider.addEventListener("input", updatePreview);
+    endSlider.addEventListener("input", updatePreview);
+
+    editor.querySelector(".cancel-btn").addEventListener("click", ()=> editor.remove());
+    editor.querySelector(".save-btn").addEventListener("click", ()=>{
+        const startDate=createTimeValueFromMinutes(parseInt(startSlider.value,10));
+        const endDate=createTimeValueFromMinutes(parseInt(endSlider.value,10));
+        if(endDate < startDate){ alert("終了時刻は開始時刻以降にしてください。" ); return; }
+        record.startDate=new Date(record.startDate.getFullYear(), record.startDate.getMonth(), record.startDate.getDate(), startDate.getHours(), startDate.getMinutes(), startDate.getSeconds());
+        record.endDate=new Date(record.endDate.getFullYear(), record.endDate.getMonth(), record.endDate.getDate(), endDate.getHours(), endDate.getMinutes(), endDate.getSeconds());
+        renderHistory();
+        sendRecordToGAS(record, "update");
+        saveSession();
+        document.getElementById("status").textContent="履歴の時刻を更新しました。";
+    });
+}
+
+function saveHistory(record){
+    const modeIcons = { "徒歩":"🚶","電車":"🚃","バス":"🚌","バイク":"🏍️","自転車":"🚲","自動車":"🚗","待ち":"⏱" };
+    const icon = modeIcons[record.transport] || "🚩";
+    const card=document.createElement("div");
+    card.className = record.isWait ? "record type-wait" : "record";
+    card.dataset.recordId = record.id;
+    const label = record.isWait ? "乗り換え待機" : "手段";
+    card.innerHTML = `
+        <div class="record-route"><span class="record-icon">${icon}</span>[${esc(record.direction)}] ${esc(record.from)} ➔ ${esc(record.to)}</div>
+        <div class="record-meta">${label}: ${esc(record.transport)}（${esc(record.posture)}） | 時間: <span class="record-duration">${format(record.endDate-record.startDate)}</span></div>
+        <div class="history-actions"><button class="history-edit-btn" type="button">時刻を編集</button></div>
+    `;
+    const btn=card.querySelector(".history-edit-btn");
+    btn.addEventListener("click", ()=> editHistoryRecord(record.id));
+    document.getElementById("history").prepend(card);
+}
+</script>
+</body>
+</html>    
