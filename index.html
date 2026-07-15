@@ -355,6 +355,139 @@ button.mainbtn.undo.show { display: block; }
 .time-editor .cancel-btn{ background:#e2e8f0; color:#334155; }
 .record.type-wait { border-left-color: #9f7aea !important; background: #faf5ff; }
 .record.type-posture-change { border-left-color: #ed8936 !important; background: #fffaf0; }
+#sensorPanel,
+#sensorConfigPanel,
+#sensorOutputPanel,
+#sensorTripsPanel,
+#sensorCorrectionPanel{
+    background:#fff;
+    border-radius:14px;
+    padding:16px;
+    margin-top:14px;
+    box-shadow:0 4px 14px rgba(15,23,42,0.06);
+    border:1px solid #e5e7eb;
+}
+#sensorPanel .panel-row,
+#sensorConfigPanel .config-grid{
+    display:grid;
+    gap:10px;
+}
+#sensorPanel .panel-actions,
+#sensorOutputPanel .panel-actions,
+#sensorCorrectionPanel .panel-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:12px;
+}
+#sensorPanel button,
+#sensorOutputPanel button,
+#sensorCorrectionPanel button,
+#sensorConfigPanel button{
+    min-height:44px;
+    border:none;
+    border-radius:10px;
+    padding:10px 12px;
+    font-weight:bold;
+    cursor:pointer;
+}
+#sensorPanel .start-btn{ background:linear-gradient(135deg,#0ea5e9,#2563eb); color:#fff; }
+#sensorPanel .stop-btn{ background:#ef4444; color:#fff; }
+#sensorPanel .export-btn{ background:#10b981; color:#fff; }
+#sensorPanel .clear-btn{ background:#f3f4f6; color:#334155; border:1px solid #d1d5db; }
+#sensorPanel .status-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 10px;
+    border-radius:999px;
+    background:#eff6ff;
+    color:#1d4ed8;
+    font-size:12px;
+    font-weight:700;
+}
+#sensorPanel .status-pill.active{ background:#dcfce7; color:#166534; }
+#sensorPanel .status-pill.error{ background:#fef2f2; color:#b91c1c; }
+#sensorPanel .sensor-meta{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:8px;
+    margin-top:12px;
+}
+#sensorPanel .sensor-meta .meta-card{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    border-radius:10px;
+    padding:10px;
+}
+#sensorPanel .meta-card .meta-label{
+    font-size:11px;
+    color:#64748b;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+}
+#sensorPanel .meta-card .meta-value{
+    margin-top:4px;
+    font-size:14px;
+    color:#0f172a;
+    font-weight:700;
+    word-break:break-word;
+}
+#sensorConfigPanel .config-grid{
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+}
+#sensorConfigPanel label{
+    margin-top:0;
+    font-size:12px;
+}
+#sensorConfigPanel input[type="number"],
+#sensorConfigPanel input[type="text"],
+#sensorOutputPanel textarea{
+    width:100%;
+    box-sizing:border-box;
+    border:1px solid #cbd5e1;
+    border-radius:10px;
+    background:#fff;
+    padding:10px 12px;
+    min-height:44px;
+    font-size:14px;
+}
+#sensorOutputPanel textarea{
+    min-height:180px;
+    font-family:Consolas, 'SFMono-Regular', Menlo, Monaco, monospace;
+    resize:vertical;
+}
+.sensor-trip-list{ display:grid; gap:10px; margin-top:10px; }
+.sensor-trip-card{
+    border:1px solid #dbeafe;
+    border-radius:12px;
+    padding:12px;
+    background:linear-gradient(135deg,#ffffff,#f8fbff);
+}
+.sensor-trip-card .trip-head{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+.sensor-trip-card .trip-mode{ font-size:16px; font-weight:800; color:#0f172a; }
+.sensor-trip-card .trip-confidence{ font-size:12px; color:#0369a1; background:#e0f2fe; padding:4px 8px; border-radius:999px; white-space:nowrap; }
+.sensor-trip-card .trip-line{ margin-top:6px; font-size:13px; color:#334155; word-break:break-word; }
+.sensor-trip-card .trip-actions{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+.sensor-trip-card .trip-actions button{ background:#eef2ff; color:#4338ca; }
+.sensor-trip-card .trip-editor{ margin-top:10px; padding:10px; border:1px solid #e2e8f0; border-radius:10px; background:#f8fafc; display:none; }
+.sensor-trip-card .trip-editor.show{ display:block; }
+.sensor-trip-card .editor-grid{ display:grid; gap:8px; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); }
+.sensor-trip-card .editor-grid label{ margin-top:0; font-size:12px; }
+.sensor-trip-card .editor-grid input,
+.sensor-trip-card .editor-grid select,
+.sensor-trip-card .editor-grid textarea{
+    width:100%; box-sizing:border-box; border:1px solid #cbd5e1; border-radius:10px; padding:10px; font-size:14px; background:#fff;
+}
+.sensor-trip-card .editor-actions{ display:flex; gap:8px; margin-top:8px; }
+.sensor-trip-card .editor-actions button{ flex:1; }
+.sensor-trip-card .save-btn{ background:#2563eb; color:#fff; }
+.sensor-trip-card .cancel-btn{ background:#e2e8f0; color:#334155; }
+.sensor-note{ font-size:12px; color:#64748b; line-height:1.5; margin-top:8px; }
+#sensorCorrectionLog{ margin-top:10px; display:grid; gap:8px; }
+.correction-item{ border:1px solid #e5e7eb; border-radius:10px; padding:10px; background:#fff; font-size:13px; color:#334155; }
+#sensorJsonOutput{ white-space:pre-wrap; }
 #status { text-align: center; font-size: 13px; color: #718096; margin-top: 8px; min-height: 16px; font-weight: bold; }
 </style>
 
@@ -435,10 +568,95 @@ button.mainbtn.undo.show { display: block; }
 <h3>履歴</h3>
 <div id="history"></div>
 
+<h3>🛰️ 自動判定（GPS + 加速度）</h3>
+<div id="sensorPanel">
+    <div class="panel-row">
+        <div id="sensorStatusPill" class="status-pill">停止中</div>
+        <div class="sensor-note">GPSの速度と加速度から移動区間を自動推定します。iPhoneでは開始時にモーション許可が必要です。</div>
+    </div>
+    <div class="sensor-meta">
+        <div class="meta-card"><div class="meta-label">GPSサンプル</div><div class="meta-value" id="gpsSampleCount">0</div></div>
+        <div class="meta-card"><div class="meta-label">加速度サンプル</div><div class="meta-value" id="accelSampleCount">0</div></div>
+        <div class="meta-card"><div class="meta-label">現在状態</div><div class="meta-value" id="sensorStateLabel">未解析</div></div>
+        <div class="meta-card"><div class="meta-label">現在候補</div><div class="meta-value" id="sensorModeLabel">-</div></div>
+    </div>
+    <div class="panel-actions">
+        <button type="button" class="start-btn" onclick="startSensorMonitoring()">センサー計測を開始</button>
+        <button type="button" class="stop-btn" onclick="stopSensorMonitoring()">計測を停止</button>
+        <button type="button" class="export-btn" onclick="exportSensorTrips()">JSONを出力</button>
+        <button type="button" class="clear-btn" onclick="clearSensorTrips()">記録をクリア</button>
+    </div>
+</div>
+
+<div id="sensorConfigPanel">
+    <label>判定設定（後で実測に合わせて変更可能）</label>
+    <div class="config-grid">
+        <div><label>停止速度閾値 (m/s)</label><input type="number" id="cfgStopSpeedThreshold" step="0.1"></div>
+        <div><label>停止継続時間 (秒)</label><input type="number" id="cfgStopDurationSec" step="1"></div>
+        <div><label>短いバス停止許容 (秒)</label><input type="number" id="cfgBusShortStopSec" step="1"></div>
+        <div><label>GPS平滑点数</label><input type="number" id="cfgGpsSmoothPoints" step="1"></div>
+        <div><label>加速度停止分散閾値</label><input type="number" id="cfgAccelVarianceThreshold" step="0.01"></div>
+        <div><label>解析窓 (秒)</label><input type="number" id="cfgAnalysisWindowSec" step="1"></div>
+        <div><label>歩行速度下限 (m/s)</label><input type="number" id="cfgWalkMinSpeed" step="0.1"></div>
+        <div><label>歩行速度上限 (m/s)</label><input type="number" id="cfgWalkMaxSpeed" step="0.1"></div>
+        <div><label>自転車速度下限 (m/s)</label><input type="number" id="cfgBikeMinSpeed" step="0.1"></div>
+        <div><label>自転車速度上限 (m/s)</label><input type="number" id="cfgBikeMaxSpeed" step="0.1"></div>
+        <div><label>電車速度下限 (m/s)</label><input type="number" id="cfgRailMinSpeed" step="0.1"></div>
+        <div><label>自動車速度下限 (m/s)</label><input type="number" id="cfgCarMinSpeed" step="0.1"></div>
+    </div>
+    <div class="panel-actions">
+        <button type="button" class="export-btn" onclick="saveSensorConfigFromUI()">設定を保存</button>
+    </div>
+</div>
+
+<div id="sensorOutputPanel">
+    <label>自動判定ログ（JSON配列）</label>
+    <textarea id="sensorJsonOutput" readonly></textarea>
+    <div class="sensor-note">出力はISO8601形式です。Fitbit側の時刻と突き合わせる前提で、全時刻を toISOString() ベースで保持します。</div>
+</div>
+
+<div id="sensorTripsPanel">
+    <label>検出結果一覧</label>
+    <div id="sensorTripsList" class="sensor-trip-list"></div>
+</div>
+
+<div id="sensorCorrectionPanel">
+    <label>修正履歴</label>
+    <div class="sensor-note">自動判定を手動修正した履歴を残し、閾値調整の材料にします。</div>
+    <div id="sensorCorrectionLog"></div>
+</div>
+
 <script>
 const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbw_UjIsOSWQNqRqmCLyiz5ljG1ZXY6apX1AVKsY4LopRP9Qom5rPBDadWt9eK-dhBhd/exec";
 const SESSION_KEY = "idoukeiro_session_v5";
 const PRESET_ROUTE_KEY = "idoukeiro_preset_route_v5";
+const SENSOR_CONFIG_KEY = "idoukeiro_sensor_config_v1";
+const SENSOR_TRIPS_KEY = "idoukeiro_sensor_trips_v1";
+const SENSOR_CORRECTIONS_KEY = "idoukeiro_sensor_corrections_v1";
+
+const DEFAULT_SENSOR_CONFIG = {
+    stopSpeedThreshold: 0.5,
+    stopDurationSec: 10,
+    busShortStopSec: 60,
+    gpsSmoothPoints: 5,
+    accelVarianceThreshold: 0.35,
+    analysisWindowSec: 15,
+    accelHighPassWindowSec: 2,
+    walkMinSpeed: 0.8,
+    walkMaxSpeed: 2.2,
+    bikeMinSpeed: 3,
+    bikeMaxSpeed: 7.5,
+    railMinSpeed: 5,
+    carMinSpeed: 3,
+    carMaxSpeed: 20,
+    motorcycleMinSpeed: 4,
+    motorcycleMaxSpeed: 18,
+    gpsTrimAgeSec: 300,
+    accelTrimAgeSec: 120,
+    straightnessThreshold: 0.86
+};
+
+const SENSOR_MODE_OPTIONS = ["徒歩", "自転車", "バス", "電車", "自動車", "バイク", "不明"];
 
 let totalStart=null;
 let sectionStart=null;
@@ -450,6 +668,9 @@ let records=[];
 let lastReminderTime = null;
 let reminderTimerID = null;
 let reminderShown = false;
+
+let sensorConfig = { ...DEFAULT_SENSOR_CONFIG };
+let sensorState = null;
 
 let compiledRoute = []; 
 let currentStepIndex = 0; 
@@ -481,6 +702,8 @@ window.addEventListener("DOMContentLoaded", function(){
             localStorage.removeItem(SESSION_KEY);
         }
     }
+
+    initializeSensorModule();
 });
 
 function buildDefaultInitialRoute(direction) {
@@ -1365,6 +1588,816 @@ function saveHistory(record){
     const btn=card.querySelector(".history-edit-btn");
     btn.addEventListener("click", ()=> editHistoryRecord(record.id));
     document.getElementById("history").prepend(card);
+}
+
+function initializeSensorModule(){
+    sensorState = {
+        running: false,
+        gpsWatchId: null,
+        motionListenerAttached: false,
+        gpsSamples: [],
+        accelSamples: [],
+        completedTrips: [],
+        correctionHistory: [],
+        currentTrip: null,
+        currentState: "unknown",
+        currentStateSinceMs: null,
+        stopStartMs: null,
+        currentModeCandidate: { mode: "不明", confidence: 0 },
+        analysisTimerId: null
+    };
+
+    loadSensorConfig();
+    loadSensorDataFromStorage();
+    renderSensorConfigToUI();
+    renderSensorDashboard();
+    bindSensorConfigInputs();
+    updateSensorStatusPill("停止中", false, false);
+}
+
+function loadSensorConfig(){
+    const saved = localStorage.getItem(SENSOR_CONFIG_KEY);
+    if(!saved){
+        sensorConfig = { ...DEFAULT_SENSOR_CONFIG };
+        return;
+    }
+    try{
+        sensorConfig = { ...DEFAULT_SENSOR_CONFIG, ...JSON.parse(saved) };
+    }catch(e){
+        sensorConfig = { ...DEFAULT_SENSOR_CONFIG };
+    }
+}
+
+function saveSensorConfig(){
+    localStorage.setItem(SENSOR_CONFIG_KEY, JSON.stringify(sensorConfig));
+}
+
+function loadSensorDataFromStorage(){
+    try{
+        const tripsRaw = localStorage.getItem(SENSOR_TRIPS_KEY);
+        const correctionsRaw = localStorage.getItem(SENSOR_CORRECTIONS_KEY);
+        sensorState.completedTrips = tripsRaw ? JSON.parse(tripsRaw).map(normalizeTripRecord) : [];
+        sensorState.correctionHistory = correctionsRaw ? JSON.parse(correctionsRaw) : [];
+    }catch(e){
+        sensorState.completedTrips = [];
+        sensorState.correctionHistory = [];
+    }
+}
+
+function persistSensorData(){
+    localStorage.setItem(SENSOR_TRIPS_KEY, JSON.stringify(sensorState.completedTrips));
+    localStorage.setItem(SENSOR_CORRECTIONS_KEY, JSON.stringify(sensorState.correctionHistory));
+}
+
+function normalizeTripRecord(trip){
+    return {
+        id: trip.id || makeId(),
+        mode: trip.mode || "不明",
+        boarding_time: trip.boarding_time,
+        alighting_time: trip.alighting_time,
+        duration_sec: Number.isFinite(trip.duration_sec) ? trip.duration_sec : getDurationSeconds(new Date(trip.boarding_time), new Date(trip.alighting_time)),
+        start_location: trip.start_location || null,
+        end_location: trip.end_location || null,
+        confidence: typeof trip.confidence === "number" ? trip.confidence : 0,
+        evidence: trip.evidence || {},
+        isEdited: !!trip.isEdited
+    };
+}
+
+function renderSensorConfigToUI(){
+    document.getElementById("cfgStopSpeedThreshold").value = sensorConfig.stopSpeedThreshold;
+    document.getElementById("cfgStopDurationSec").value = sensorConfig.stopDurationSec;
+    document.getElementById("cfgBusShortStopSec").value = sensorConfig.busShortStopSec;
+    document.getElementById("cfgGpsSmoothPoints").value = sensorConfig.gpsSmoothPoints;
+    document.getElementById("cfgAccelVarianceThreshold").value = sensorConfig.accelVarianceThreshold;
+    document.getElementById("cfgAnalysisWindowSec").value = sensorConfig.analysisWindowSec;
+    document.getElementById("cfgWalkMinSpeed").value = sensorConfig.walkMinSpeed;
+    document.getElementById("cfgWalkMaxSpeed").value = sensorConfig.walkMaxSpeed;
+    document.getElementById("cfgBikeMinSpeed").value = sensorConfig.bikeMinSpeed;
+    document.getElementById("cfgBikeMaxSpeed").value = sensorConfig.bikeMaxSpeed;
+    document.getElementById("cfgRailMinSpeed").value = sensorConfig.railMinSpeed;
+    document.getElementById("cfgCarMinSpeed").value = sensorConfig.carMinSpeed;
+}
+
+function bindSensorConfigInputs(){
+    ["cfgStopSpeedThreshold","cfgStopDurationSec","cfgBusShortStopSec","cfgGpsSmoothPoints","cfgAccelVarianceThreshold","cfgAnalysisWindowSec","cfgWalkMinSpeed","cfgWalkMaxSpeed","cfgBikeMinSpeed","cfgBikeMaxSpeed","cfgRailMinSpeed","cfgCarMinSpeed"].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.addEventListener("change", saveSensorConfigFromUI);
+    });
+}
+
+function saveSensorConfigFromUI(){
+    sensorConfig.stopSpeedThreshold = parseFloat(document.getElementById("cfgStopSpeedThreshold").value) || DEFAULT_SENSOR_CONFIG.stopSpeedThreshold;
+    sensorConfig.stopDurationSec = parseFloat(document.getElementById("cfgStopDurationSec").value) || DEFAULT_SENSOR_CONFIG.stopDurationSec;
+    sensorConfig.busShortStopSec = parseFloat(document.getElementById("cfgBusShortStopSec").value) || DEFAULT_SENSOR_CONFIG.busShortStopSec;
+    sensorConfig.gpsSmoothPoints = Math.max(1, parseInt(document.getElementById("cfgGpsSmoothPoints").value, 10) || DEFAULT_SENSOR_CONFIG.gpsSmoothPoints);
+    sensorConfig.accelVarianceThreshold = parseFloat(document.getElementById("cfgAccelVarianceThreshold").value) || DEFAULT_SENSOR_CONFIG.accelVarianceThreshold;
+    sensorConfig.analysisWindowSec = parseFloat(document.getElementById("cfgAnalysisWindowSec").value) || DEFAULT_SENSOR_CONFIG.analysisWindowSec;
+    sensorConfig.walkMinSpeed = parseFloat(document.getElementById("cfgWalkMinSpeed").value) || DEFAULT_SENSOR_CONFIG.walkMinSpeed;
+    sensorConfig.walkMaxSpeed = parseFloat(document.getElementById("cfgWalkMaxSpeed").value) || DEFAULT_SENSOR_CONFIG.walkMaxSpeed;
+    sensorConfig.bikeMinSpeed = parseFloat(document.getElementById("cfgBikeMinSpeed").value) || DEFAULT_SENSOR_CONFIG.bikeMinSpeed;
+    sensorConfig.bikeMaxSpeed = parseFloat(document.getElementById("cfgBikeMaxSpeed").value) || DEFAULT_SENSOR_CONFIG.bikeMaxSpeed;
+    sensorConfig.railMinSpeed = parseFloat(document.getElementById("cfgRailMinSpeed").value) || DEFAULT_SENSOR_CONFIG.railMinSpeed;
+    sensorConfig.carMinSpeed = parseFloat(document.getElementById("cfgCarMinSpeed").value) || DEFAULT_SENSOR_CONFIG.carMinSpeed;
+    saveSensorConfig();
+    renderSensorDashboard();
+}
+
+function updateSensorStatusPill(text, active, isError){
+    const pill = document.getElementById("sensorStatusPill");
+    if(!pill) return;
+    pill.textContent = text;
+    pill.classList.remove("active", "error");
+    if(active) pill.classList.add("active");
+    if(isError) pill.classList.add("error");
+}
+
+function startSensorMonitoring(){
+    if(sensorState.running) return;
+    const startFlow = () => {
+        sensorState.running = true;
+        updateSensorStatusPill("計測中", true, false);
+        sensorState.gpsSamples = [];
+        sensorState.accelSamples = [];
+        sensorState.currentTrip = null;
+        sensorState.currentState = "unknown";
+        sensorState.currentStateSinceMs = null;
+        sensorState.stopStartMs = null;
+        sensorState.currentModeCandidate = { mode: "不明", confidence: 0 };
+        renderSensorDashboard();
+
+        if(sensorState.gpsWatchId === null && navigator.geolocation){
+            sensorState.gpsWatchId = navigator.geolocation.watchPosition(handleGpsPosition, handleSensorError, {
+                enableHighAccuracy: true,
+                maximumAge: 1000,
+                timeout: 10000
+            });
+        }
+
+        if(!sensorState.motionListenerAttached && window.DeviceMotionEvent){
+            window.addEventListener("devicemotion", handleMotionEvent, { passive: true });
+            sensorState.motionListenerAttached = true;
+        }
+
+        analyzeSensorData();
+    };
+
+    const motionPermissionApi = window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function";
+    if(motionPermissionApi){
+        DeviceMotionEvent.requestPermission().then(result => {
+            if(result === "granted"){
+                startFlow();
+            }else{
+                updateSensorStatusPill("モーション許可が必要", false, true);
+                alert("加速度センサーの利用許可が必要です。iPhoneでは開始時の許可を承認してください。");
+            }
+        }).catch(err => {
+            updateSensorStatusPill("許可失敗", false, true);
+            alert("モーションセンサーの許可に失敗しました。" + err);
+        });
+        return;
+    }
+
+    startFlow();
+}
+
+function stopSensorMonitoring(){
+    if(sensorState.gpsWatchId !== null && navigator.geolocation){
+        navigator.geolocation.clearWatch(sensorState.gpsWatchId);
+        sensorState.gpsWatchId = null;
+    }
+    if(sensorState.motionListenerAttached){
+        window.removeEventListener("devicemotion", handleMotionEvent);
+        sensorState.motionListenerAttached = false;
+    }
+    if(sensorState.analysisTimerId){
+        clearTimeout(sensorState.analysisTimerId);
+        sensorState.analysisTimerId = null;
+    }
+    sensorState.running = false;
+    updateSensorStatusPill("停止中", false, false);
+    finalizeOpenSensorTrip(true);
+    renderSensorDashboard();
+}
+
+function handleSensorError(error){
+    updateSensorStatusPill("GPS取得エラー", false, true);
+    document.getElementById("sensorStateLabel").textContent = error && error.message ? error.message : "位置情報取得に失敗しました";
+}
+
+function handleGpsPosition(position){
+    const coords = position.coords || {};
+    const timestampMs = typeof position.timestamp === "number" ? position.timestamp : Date.now();
+    const sample = {
+        timestampMs,
+        timestampIso: new Date(timestampMs).toISOString(),
+        latitude: coords.latitude,
+        longitude: coords.longitude,
+        speed: typeof coords.speed === "number" && coords.speed >= 0 ? coords.speed : null,
+        accuracy: typeof coords.accuracy === "number" ? coords.accuracy : null
+    };
+    sensorState.gpsSamples.push(sample);
+    trimSensorSamples();
+    analyzeSensorData();
+}
+
+function handleMotionEvent(event){
+    const acceleration = event.acceleration || event.accelerationIncludingGravity || {};
+    const timestampMs = Date.now();
+    const sample = {
+        timestampMs,
+        timestampIso: new Date(timestampMs).toISOString(),
+        x: typeof acceleration.x === "number" ? acceleration.x : 0,
+        y: typeof acceleration.y === "number" ? acceleration.y : 0,
+        z: typeof acceleration.z === "number" ? acceleration.z : 0
+    };
+    sensorState.accelSamples.push(sample);
+    trimSensorSamples();
+    analyzeSensorData();
+}
+
+function trimSensorSamples(){
+    const now = Date.now();
+    const gpsMaxAge = sensorConfig.gpsTrimAgeSec * 1000;
+    const accelMaxAge = sensorConfig.accelTrimAgeSec * 1000;
+    sensorState.gpsSamples = sensorState.gpsSamples.filter(sample => now - sample.timestampMs <= gpsMaxAge);
+    sensorState.accelSamples = sensorState.accelSamples.filter(sample => now - sample.timestampMs <= accelMaxAge);
+}
+
+function analyzeSensorData(){
+    if(sensorState.analysisTimerId){
+        clearTimeout(sensorState.analysisTimerId);
+    }
+    sensorState.analysisTimerId = setTimeout(() => {
+        sensorState.analysisTimerId = null;
+        runSensorAnalysis();
+    }, 150);
+}
+
+function runSensorAnalysis(){
+    const nowMs = Date.now();
+    const windowMs = sensorConfig.analysisWindowSec * 1000;
+    const gpsWindow = sensorState.gpsSamples.filter(sample => nowMs - sample.timestampMs <= windowMs * 2);
+    const accelWindow = sensorState.accelSamples.filter(sample => nowMs - sample.timestampMs <= windowMs * 2);
+
+    document.getElementById("gpsSampleCount").textContent = String(sensorState.gpsSamples.length);
+    document.getElementById("accelSampleCount").textContent = String(sensorState.accelSamples.length);
+
+    if(gpsWindow.length === 0 || accelWindow.length === 0){
+        document.getElementById("sensorStateLabel").textContent = "サンプル待ち";
+        document.getElementById("sensorModeLabel").textContent = "-";
+        renderSensorDashboard();
+        return;
+    }
+
+    const features = computeWindowFeatures(gpsWindow, accelWindow, nowMs, windowMs);
+    const stationary = isStationary(features, nowMs);
+    const modeCandidate = stationary ? { mode: "停止", confidence: 1 } : classifyTravelMode(features);
+
+    document.getElementById("sensorStateLabel").textContent = stationary ? "停止" : `移動中 (${modeCandidate.mode})`;
+    document.getElementById("sensorModeLabel").textContent = stationary ? "停止" : `${modeCandidate.mode} / ${Math.round(modeCandidate.confidence * 100)}%`;
+
+    updateSensorTripState(stationary, modeCandidate, features);
+    renderSensorDashboard();
+}
+
+function computeWindowFeatures(gpsWindow, accelWindow, nowMs, windowMs){
+    const gpsRelevant = gpsWindow.filter(sample => nowMs - sample.timestampMs <= windowMs);
+    const accelRelevant = accelWindow.filter(sample => nowMs - sample.timestampMs <= windowMs);
+
+    const speedValues = gpsRelevant.map((sample, index, array) => {
+        const rawSpeed = typeof sample.speed === "number" ? sample.speed : estimateSpeedFromNeighbors(array, index);
+        return rawSpeed;
+    });
+    const smoothedSpeedValues = movingAverage(speedValues, Math.max(1, sensorConfig.gpsSmoothPoints));
+    const latestSpeed = smoothedSpeedValues.length ? smoothedSpeedValues[smoothedSpeedValues.length - 1] : 0;
+    const avgSpeed = average(smoothedSpeedValues);
+    const speedStd = standardDeviation(smoothedSpeedValues);
+
+    const accelMagnitudes = accelRelevant.map(sample => Math.sqrt(sample.x * sample.x + sample.y * sample.y + sample.z * sample.z));
+    const accelBaseline = average(accelMagnitudes.slice(-Math.min(accelMagnitudes.length, Math.max(3, Math.round(sensorConfig.accelHighPassWindowSec * 10)))));
+    const accelHighPass = accelMagnitudes.map(value => value - accelBaseline);
+    const accelStd = standardDeviation(accelHighPass);
+    const accelVariance = variance(accelHighPass);
+    const jerkSeries = accelHighPass.map((value, index, array) => index === 0 ? 0 : value - array[index - 1]).slice(1);
+    const jerkStd = standardDeviation(jerkSeries);
+
+    const walkingPeakCount = countLocalPeaks(accelHighPass, Math.max(0.35, sensorConfig.accelVarianceThreshold / 2));
+    const walkingPeriodicityScore = clamp(walkingPeakCount / Math.max(1, windowSeconds(accelRelevant)), 0, 1);
+
+    const stopSamples = gpsRelevant.filter((sample, index) => {
+        const rawSpeed = typeof sample.speed === "number" ? sample.speed : estimateSpeedFromNeighbors(gpsRelevant, index);
+        return rawSpeed < sensorConfig.stopSpeedThreshold;
+    }).length;
+    const stationaryRatio = gpsRelevant.length ? stopSamples / gpsRelevant.length : 0;
+
+    const pathLength = calcPathLengthMeters(gpsRelevant);
+    const netDistance = gpsRelevant.length > 1 ? haversineMeters(gpsRelevant[0].latitude, gpsRelevant[0].longitude, gpsRelevant[gpsRelevant.length - 1].latitude, gpsRelevant[gpsRelevant.length - 1].longitude) : 0;
+    const straightness = pathLength > 0 ? clamp(netDistance / pathLength, 0, 1) : 0;
+
+    const gaps = countGpsGaps(gpsRelevant);
+    const accuracyAverage = average(gpsRelevant.map(sample => sample.accuracy || 0));
+
+    return {
+        latestSpeed,
+        avgSpeed,
+        speedStd,
+        accelStd,
+        accelVariance,
+        jerkStd,
+        walkingPeriodicityScore,
+        stationaryRatio,
+        straightness,
+        pathLength,
+        netDistance,
+        gpsGapCount: gaps,
+        accuracyAverage,
+        sampleCount: gpsRelevant.length,
+        accelSampleCount: accelRelevant.length,
+        latestGps: gpsRelevant[gpsRelevant.length - 1],
+        latestAccel: accelRelevant[accelRelevant.length - 1]
+    };
+}
+
+function isStationary(features, nowMs){
+    const speedQuiet = features.latestSpeed < sensorConfig.stopSpeedThreshold && features.avgSpeed < sensorConfig.stopSpeedThreshold + 0.2;
+    const accelQuiet = features.accelVariance <= sensorConfig.accelVarianceThreshold;
+    const candidate = speedQuiet && accelQuiet;
+
+    if(candidate){
+        if(sensorState.currentState !== "stationary"){
+            sensorState.currentStateSinceMs = nowMs;
+        }
+        sensorState.currentState = "stationary";
+        sensorState.stopStartMs = sensorState.stopStartMs || nowMs;
+    }else{
+        if(sensorState.currentState !== "moving"){
+            sensorState.currentStateSinceMs = nowMs;
+        }
+        sensorState.currentState = "moving";
+        sensorState.stopStartMs = null;
+    }
+
+    const stationaryDuration = sensorState.currentState === "stationary" && sensorState.currentStateSinceMs ? nowMs - sensorState.currentStateSinceMs : 0;
+    return candidate && stationaryDuration >= sensorConfig.stopDurationSec * 1000;
+}
+
+function classifyTravelMode(features){
+    const scores = [];
+    scores.push({ mode: "徒歩", score: scoreWalking(features) });
+    scores.push({ mode: "自転車", score: scoreBicycle(features) });
+    scores.push({ mode: "バス", score: scoreBus(features) });
+    scores.push({ mode: "電車", score: scoreTrain(features) });
+    scores.push({ mode: "自動車", score: scoreCar(features) });
+    scores.push({ mode: "バイク", score: scoreMotorcycle(features) });
+    scores.sort((a, b) => b.score - a.score);
+    const top = scores[0] || { mode: "不明", score: 0 };
+    const second = scores[1] || { score: 0 };
+    const confidence = clamp(top.score - second.score * 0.35, 0.1, 0.99);
+    return { mode: top.mode, confidence, scores, features };
+}
+
+function scoreWalking(features){
+    let score = 0;
+    if(features.avgSpeed >= sensorConfig.walkMinSpeed && features.avgSpeed <= sensorConfig.walkMaxSpeed) score += 0.55;
+    if(features.walkingPeriodicityScore >= 0.25) score += 0.3;
+    if(features.accelStd >= 0.2 && features.accelStd <= 2.5) score += 0.15;
+    if(features.straightness < 0.92) score += 0.05;
+    return clamp(score, 0, 1);
+}
+
+function scoreBicycle(features){
+    let score = 0;
+    if(features.avgSpeed >= sensorConfig.bikeMinSpeed && features.avgSpeed <= sensorConfig.bikeMaxSpeed) score += 0.55;
+    if(features.accelStd >= 0.12 && features.accelStd <= 1.7) score += 0.2;
+    if(features.jerkStd < 0.8) score += 0.15;
+    if(features.stationaryRatio < 0.35) score += 0.1;
+    return clamp(score, 0, 1);
+}
+
+function scoreBus(features){
+    let score = 0;
+    if(features.avgSpeed >= 3 && features.avgSpeed <= 20) score += 0.25;
+    if(features.stationaryRatio >= 0.08) score += 0.3;
+    if(features.speedStd >= 0.2 && features.speedStd <= 2.8) score += 0.2;
+    if(features.jerkStd <= 1.5) score += 0.15;
+    if(features.straightness >= 0.75) score += 0.1;
+    return clamp(score, 0, 1);
+}
+
+function scoreTrain(features){
+    let score = 0;
+    if(features.avgSpeed >= sensorConfig.railMinSpeed) score += 0.35;
+    if(features.accelStd <= 0.9) score += 0.2;
+    if(features.jerkStd <= 0.9) score += 0.2;
+    if(features.stationaryRatio < 0.15) score += 0.15;
+    if(features.straightness >= sensorConfig.straightnessThreshold) score += 0.1;
+    return clamp(score, 0, 1);
+}
+
+function scoreCar(features){
+    let score = 0;
+    if(features.avgSpeed >= sensorConfig.carMinSpeed && features.avgSpeed <= sensorConfig.carMaxSpeed) score += 0.4;
+    if(features.accelStd <= 1.4) score += 0.2;
+    if(features.jerkStd <= 1.0) score += 0.2;
+    if(features.stationaryRatio < 0.2) score += 0.1;
+    if(features.straightness >= 0.8) score += 0.1;
+    return clamp(score, 0, 1);
+}
+
+function scoreMotorcycle(features){
+    let score = 0;
+    if(features.avgSpeed >= sensorConfig.motorcycleMinSpeed && features.avgSpeed <= sensorConfig.motorcycleMaxSpeed) score += 0.4;
+    if(features.accelStd > 0.8) score += 0.25;
+    if(features.jerkStd > 0.8) score += 0.2;
+    if(features.stationaryRatio < 0.2) score += 0.1;
+    if(features.straightness >= 0.78) score += 0.05;
+    return clamp(score, 0, 1);
+}
+
+function updateSensorTripState(stationary, modeCandidate, features){
+    const nowMs = features.latestGps ? features.latestGps.timestampMs : Date.now();
+
+    if(stationary){
+        if(sensorState.currentTrip){
+            const stopStartMs = sensorState.stopStartMs || nowMs;
+            const stopDurationMs = nowMs - stopStartMs;
+            const allowedStopMs = sensorState.currentTrip.mode === "バス" ? sensorConfig.busShortStopSec * 1000 : sensorConfig.stopDurationSec * 1000;
+            if(stopDurationMs >= allowedStopMs){
+                finalizeSensorTrip(stopStartMs, features);
+            }
+        }
+        sensorState.currentModeCandidate = { mode: "停止", confidence: 1 };
+        return;
+    }
+
+    sensorState.currentModeCandidate = modeCandidate;
+
+    if(!sensorState.currentTrip){
+        startSensorTrip(modeCandidate, features);
+        return;
+    }
+
+    if(sensorState.currentTrip && sensorState.currentTrip.mode === "バス" && sensorState.stopStartMs){
+        const stopDurationMs = nowMs - sensorState.stopStartMs;
+        if(stopDurationMs < sensorConfig.busShortStopSec * 1000){
+            return;
+        }
+    }
+
+    if(modeCandidate.confidence > sensorState.currentTrip.confidence){
+        sensorState.currentTrip.mode = modeCandidate.mode;
+        sensorState.currentTrip.confidence = modeCandidate.confidence;
+        sensorState.currentTrip.evidence = features;
+    }
+}
+
+function startSensorTrip(modeCandidate, features){
+    const startSample = features.latestGps;
+    if(!startSample) return;
+    sensorState.currentTrip = {
+        id: makeId(),
+        mode: modeCandidate.mode,
+        boarding_time: new Date(startSample.timestampMs).toISOString(),
+        alighting_time: null,
+        duration_sec: null,
+        start_location: { lat: startSample.latitude, lng: startSample.longitude },
+        end_location: null,
+        confidence: modeCandidate.confidence,
+        evidence: features,
+        isEdited: false
+    };
+    sensorState.currentStateSinceMs = startSample.timestampMs;
+}
+
+function finalizeOpenSensorTrip(force){
+    if(!sensorState.currentTrip) return;
+    const lastGps = sensorState.gpsSamples[sensorState.gpsSamples.length - 1];
+    const endMs = force && lastGps ? lastGps.timestampMs : Date.now();
+    finalizeSensorTrip(endMs, sensorState.currentTrip.evidence || {});
+}
+
+function finalizeSensorTrip(alightingMs, features){
+    if(!sensorState.currentTrip) return;
+    const trip = { ...sensorState.currentTrip };
+    trip.alighting_time = new Date(alightingMs).toISOString();
+    trip.duration_sec = Math.max(0, Math.floor((alightingMs - new Date(trip.boarding_time).getTime()) / 1000));
+    trip.end_location = resolveNearestLocation(alightingMs) || trip.start_location;
+    trip.evidence = features || trip.evidence || {};
+    trip.id = trip.id || makeId();
+    trip.isEdited = !!trip.isEdited;
+    sensorState.completedTrips.push(normalizeTripRecord(trip));
+    sensorState.currentTrip = null;
+    sensorState.stopStartMs = null;
+    sensorState.currentState = "unknown";
+    sensorState.currentStateSinceMs = null;
+    persistSensorData();
+    renderSensorDashboard();
+}
+
+function resolveNearestLocation(alightingMs){
+    const candidates = sensorState.gpsSamples.filter(sample => sample.timestampMs <= alightingMs);
+    const sample = candidates.length ? candidates[candidates.length - 1] : sensorState.gpsSamples[sensorState.gpsSamples.length - 1];
+    if(!sample) return null;
+    return { lat: sample.latitude, lng: sample.longitude };
+}
+
+function renderSensorDashboard(){
+    renderSensorTrips();
+    renderSensorJsonOutput();
+    renderSensorCorrectionLog();
+}
+
+function renderSensorTrips(){
+    const container = document.getElementById("sensorTripsList");
+    if(!container) return;
+    container.innerHTML = "";
+    const trips = [...sensorState.completedTrips].sort((a, b) => new Date(a.boarding_time) - new Date(b.boarding_time));
+    trips.forEach(trip => {
+        const card = document.createElement("div");
+        card.className = "sensor-trip-card";
+        card.dataset.tripId = trip.id;
+        card.innerHTML = `
+            <div class="trip-head">
+                <div class="trip-mode">${esc(trip.mode)}区間</div>
+                <div class="trip-confidence">信頼度 ${(trip.confidence * 100).toFixed(0)}%</div>
+            </div>
+            <div class="trip-line">乗車: ${esc(trip.boarding_time)} / 降車: ${esc(trip.alighting_time)}</div>
+            <div class="trip-line">所要: ${esc(String(trip.duration_sec))} 秒</div>
+            <div class="trip-line">開始位置: ${trip.start_location ? `${trip.start_location.lat}, ${trip.start_location.lng}` : "-"}</div>
+            <div class="trip-line">終了位置: ${trip.end_location ? `${trip.end_location.lat}, ${trip.end_location.lng}` : "-"}</div>
+            <div class="trip-actions">
+                <button type="button" onclick="toggleSensorTripEditor('${trip.id}')">編集</button>
+                <button type="button" onclick="copySensorTripJson('${trip.id}')">JSONコピー</button>
+            </div>
+            <div class="trip-editor" id="sensorTripEditor-${trip.id}"></div>
+        `;
+        container.appendChild(card);
+    });
+    if(trips.length === 0){
+        container.innerHTML = '<div class="sensor-note">まだ自動判定区間がありません。</div>';
+    }
+}
+
+function renderSensorJsonOutput(){
+    const output = document.getElementById("sensorJsonOutput");
+    if(!output) return;
+    const payload = sensorState.completedTrips.map(trip => ({
+        mode: trip.mode,
+        boarding_time: trip.boarding_time,
+        alighting_time: trip.alighting_time,
+        duration_sec: trip.duration_sec,
+        start_location: trip.start_location,
+        end_location: trip.end_location,
+        confidence: trip.confidence
+    }));
+    output.value = JSON.stringify(payload, null, 2);
+}
+
+function renderSensorCorrectionLog(){
+    const container = document.getElementById("sensorCorrectionLog");
+    if(!container) return;
+    container.innerHTML = "";
+    const entries = [...sensorState.correctionHistory].reverse();
+    if(entries.length === 0){
+        container.innerHTML = '<div class="sensor-note">修正履歴はまだありません。</div>';
+        return;
+    }
+    entries.forEach(entry => {
+        const div = document.createElement("div");
+        div.className = "correction-item";
+        div.textContent = `${entry.editedAt} / ${entry.before.mode} → ${entry.after.mode} / ${entry.tripId}`;
+        container.appendChild(div);
+    });
+}
+
+function toggleSensorTripEditor(tripId){
+    const editor = document.getElementById(`sensorTripEditor-${tripId}`);
+    if(!editor) return;
+    if(editor.classList.contains("show")){
+        editor.classList.remove("show");
+        editor.innerHTML = "";
+        return;
+    }
+    const trip = sensorState.completedTrips.find(item => item.id === tripId);
+    if(!trip) return;
+    editor.innerHTML = `
+        <div class="editor-grid">
+            <div>
+                <label>移動手段</label>
+                <select id="editMode-${tripId}">${SENSOR_MODE_OPTIONS.map(mode => `<option value="${mode}" ${mode === trip.mode ? 'selected' : ''}>${mode}</option>`).join("")}</select>
+            </div>
+            <div>
+                <label>乗車時刻</label>
+                <input type="datetime-local" id="editBoarding-${tripId}" value="${toDateTimeLocalValue(new Date(trip.boarding_time))}">
+            </div>
+            <div>
+                <label>降車時刻</label>
+                <input type="datetime-local" id="editAlighting-${tripId}" value="${toDateTimeLocalValue(new Date(trip.alighting_time))}">
+            </div>
+            <div>
+                <label>信頼度</label>
+                <input type="number" min="0" max="1" step="0.01" id="editConfidence-${tripId}" value="${trip.confidence}">
+            </div>
+        </div>
+        <div style="margin-top:8px;">
+            <label>修正理由</label>
+            <textarea id="editReason-${tripId}" rows="3" placeholder="例: 駅停車をバス停止として誤検知したため"></textarea>
+        </div>
+        <div class="editor-actions">
+            <button type="button" class="cancel-btn" onclick="toggleSensorTripEditor('${tripId}')">閉じる</button>
+            <button type="button" class="save-btn" onclick="saveSensorTripEdit('${tripId}')">保存</button>
+        </div>
+    `;
+    editor.classList.add("show");
+}
+
+function saveSensorTripEdit(tripId){
+    const tripIndex = sensorState.completedTrips.findIndex(item => item.id === tripId);
+    if(tripIndex < 0) return;
+    const trip = sensorState.completedTrips[tripIndex];
+    const before = { ...trip };
+    const mode = document.getElementById(`editMode-${tripId}`).value;
+    const boardingInput = document.getElementById(`editBoarding-${tripId}`).value;
+    const alightingInput = document.getElementById(`editAlighting-${tripId}`).value;
+    const confidence = clamp(parseFloat(document.getElementById(`editConfidence-${tripId}`).value) || 0, 0, 1);
+    const reason = document.getElementById(`editReason-${tripId}`).value.trim();
+
+    const boardingDate = new Date(boardingInput);
+    const alightingDate = new Date(alightingInput);
+    if(!(boardingDate instanceof Date) || isNaN(boardingDate.getTime()) || !(alightingDate instanceof Date) || isNaN(alightingDate.getTime())){
+        alert("時刻を正しく入力してください。");
+        return;
+    }
+    if(alightingDate < boardingDate){
+        alert("降車時刻は乗車時刻以降にしてください。");
+        return;
+    }
+
+    trip.mode = mode;
+    trip.boarding_time = boardingDate.toISOString();
+    trip.alighting_time = alightingDate.toISOString();
+    trip.duration_sec = Math.max(0, Math.floor((alightingDate.getTime() - boardingDate.getTime()) / 1000));
+    trip.confidence = confidence;
+    trip.isEdited = true;
+    sensorState.completedTrips[tripIndex] = normalizeTripRecord(trip);
+
+    sensorState.correctionHistory.push({
+        id: makeId(),
+        tripId,
+        editedAt: new Date().toISOString(),
+        reason,
+        before: {
+            mode: before.mode,
+            boarding_time: before.boarding_time,
+            alighting_time: before.alighting_time,
+            confidence: before.confidence
+        },
+        after: {
+            mode: trip.mode,
+            boarding_time: trip.boarding_time,
+            alighting_time: trip.alighting_time,
+            confidence: trip.confidence
+        }
+    });
+
+    persistSensorData();
+    renderSensorDashboard();
+    document.getElementById("sensorStateLabel").textContent = "修正を保存しました";
+}
+
+function copySensorTripJson(tripId){
+    const trip = sensorState.completedTrips.find(item => item.id === tripId);
+    if(!trip) return;
+    const payload = {
+        mode: trip.mode,
+        boarding_time: trip.boarding_time,
+        alighting_time: trip.alighting_time,
+        duration_sec: trip.duration_sec,
+        start_location: trip.start_location,
+        end_location: trip.end_location,
+        confidence: trip.confidence
+    };
+    navigator.clipboard?.writeText(JSON.stringify(payload, null, 2));
+}
+
+function exportSensorTrips(){
+    const payload = sensorState.completedTrips.map(trip => ({
+        mode: trip.mode,
+        boarding_time: trip.boarding_time,
+        alighting_time: trip.alighting_time,
+        duration_sec: trip.duration_sec,
+        start_location: trip.start_location,
+        end_location: trip.end_location,
+        confidence: trip.confidence
+    }));
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `idoukeiro_sensor_trips_${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+}
+
+function clearSensorTrips(){
+    if(!confirm("自動判定ログをすべて削除しますか？")) return;
+    sensorState.completedTrips = [];
+    sensorState.correctionHistory = [];
+    sensorState.currentTrip = null;
+    persistSensorData();
+    renderSensorDashboard();
+}
+
+function toDateTimeLocalValue(date){
+    const offsetMs = date.getTimezoneOffset() * 60000;
+    const local = new Date(date.getTime() - offsetMs);
+    return local.toISOString().slice(0, 16);
+}
+
+function movingAverage(values, windowSize){
+    if(windowSize <= 1) return values.slice();
+    const output = [];
+    for(let index = 0; index < values.length; index++){
+        const start = Math.max(0, index - windowSize + 1);
+        const slice = values.slice(start, index + 1);
+        output.push(average(slice));
+    }
+    return output;
+}
+
+function estimateSpeedFromNeighbors(samples, index){
+    const current = samples[index];
+    if(current && typeof current.speed === "number") return current.speed;
+    if(index === 0 || index >= samples.length - 1) return 0;
+    const prev = samples[index - 1];
+    const next = samples[index + 1];
+    if(!prev || !next) return 0;
+    const distance = haversineMeters(prev.latitude, prev.longitude, next.latitude, next.longitude);
+    const seconds = Math.max(1, (next.timestampMs - prev.timestampMs) / 1000);
+    return distance / seconds;
+}
+
+function average(values){
+    if(!values || values.length === 0) return 0;
+    return values.reduce((sum, value) => sum + (Number.isFinite(value) ? value : 0), 0) / values.length;
+}
+
+function variance(values){
+    if(!values || values.length === 0) return 0;
+    const avg = average(values);
+    return average(values.map(value => Math.pow((Number.isFinite(value) ? value : 0) - avg, 2)));
+}
+
+function standardDeviation(values){
+    return Math.sqrt(variance(values));
+}
+
+function countLocalPeaks(values, threshold){
+    let count = 0;
+    for(let index = 1; index < values.length - 1; index++){
+        if(values[index] > values[index - 1] && values[index] > values[index + 1] && values[index] > threshold){
+            count++;
+        }
+    }
+    return count;
+}
+
+function calcPathLengthMeters(samples){
+    if(samples.length < 2) return 0;
+    let total = 0;
+    for(let index = 1; index < samples.length; index++){
+        total += haversineMeters(samples[index - 1].latitude, samples[index - 1].longitude, samples[index].latitude, samples[index].longitude);
+    }
+    return total;
+}
+
+function haversineMeters(lat1, lng1, lat2, lng2){
+    const R = 6371000;
+    const toRad = value => value * Math.PI / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+function countGpsGaps(samples){
+    let count = 0;
+    for(let index = 1; index < samples.length; index++){
+        if(samples[index].timestampMs - samples[index - 1].timestampMs > 10000) count++;
+    }
+    return count;
+}
+
+function clamp(value, min, max){
+    return Math.max(min, Math.min(max, value));
+}
+
+function windowSeconds(samples){
+    if(samples.length < 2) return 1;
+    return Math.max(1, (samples[samples.length - 1].timestampMs - samples[0].timestampMs) / 1000);
 }
 </script>
 </body>
