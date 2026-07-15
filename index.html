@@ -488,6 +488,34 @@ button.mainbtn.undo.show { display: block; }
 #sensorCorrectionLog{ margin-top:10px; display:grid; gap:8px; }
 .correction-item{ border:1px solid #e5e7eb; border-radius:10px; padding:10px; background:#fff; font-size:13px; color:#334155; }
 #sensorJsonOutput{ white-space:pre-wrap; }
+#sensorAdminSection{ display:none; }
+#sensorEndpointPanel{
+    background:#fff;
+    border-radius:14px;
+    padding:16px;
+    margin-top:14px;
+    box-shadow:0 4px 14px rgba(15,23,42,0.06);
+    border:1px solid #e5e7eb;
+}
+#sensorEndpointPanel .endpoint-grid{
+    display:grid;
+    gap:10px;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+}
+#sensorEndpointPanel label{
+    margin-top:0;
+    font-size:12px;
+}
+#sensorEndpointPanel input[type="text"]{
+    width:100%;
+    box-sizing:border-box;
+    border:1px solid #cbd5e1;
+    border-radius:10px;
+    background:#fff;
+    padding:10px 12px;
+    min-height:44px;
+    font-size:14px;
+}
 #status { text-align: center; font-size: 13px; color: #718096; margin-top: 8px; min-height: 16px; font-weight: bold; }
 </style>
 
@@ -568,62 +596,80 @@ button.mainbtn.undo.show { display: block; }
 <h3>履歴</h3>
 <div id="history"></div>
 
-<h3>🛰️ 自動判定（GPS + 加速度）</h3>
-<div id="sensorPanel">
-    <div class="panel-row">
-        <div id="sensorStatusPill" class="status-pill">停止中</div>
-        <div class="sensor-note">GPSの速度と加速度から移動区間を自動推定します。iPhoneでは開始時にモーション許可が必要です。</div>
+<div id="sensorAdminSection">
+    <h3>🛰️ 自動判定（GPS + 加速度）</h3>
+    <div id="sensorEndpointPanel">
+        <label>書き込み先設定</label>
+        <div class="endpoint-grid">
+            <div>
+                <label>現在情報のスプレッドシートURL</label>
+                <input type="text" id="cfgSensorCurrentSheetUrl" placeholder="https://script.google.com/macros/s/.../exec">
+            </div>
+            <div>
+                <label>GPS情報のスプレッドシートURL</label>
+                <input type="text" id="cfgSensorGpsSheetUrl" placeholder="https://script.google.com/macros/s/.../exec">
+            </div>
+        </div>
+        <div class="panel-actions">
+            <button type="button" class="export-btn" onclick="saveSensorEndpointsFromUI()">送信先を保存</button>
+        </div>
     </div>
-    <div class="sensor-meta">
-        <div class="meta-card"><div class="meta-label">GPSサンプル</div><div class="meta-value" id="gpsSampleCount">0</div></div>
-        <div class="meta-card"><div class="meta-label">加速度サンプル</div><div class="meta-value" id="accelSampleCount">0</div></div>
-        <div class="meta-card"><div class="meta-label">現在状態</div><div class="meta-value" id="sensorStateLabel">未解析</div></div>
-        <div class="meta-card"><div class="meta-label">現在候補</div><div class="meta-value" id="sensorModeLabel">-</div></div>
+    <div id="sensorPanel">
+        <div class="panel-row">
+            <div id="sensorStatusPill" class="status-pill">停止中</div>
+            <div class="sensor-note">GPSの速度と加速度から移動区間を自動推定します。iPhoneでは開始時にモーション許可が必要です。</div>
+        </div>
+        <div class="sensor-meta">
+            <div class="meta-card"><div class="meta-label">GPSサンプル</div><div class="meta-value" id="gpsSampleCount">0</div></div>
+            <div class="meta-card"><div class="meta-label">加速度サンプル</div><div class="meta-value" id="accelSampleCount">0</div></div>
+            <div class="meta-card"><div class="meta-label">現在状態</div><div class="meta-value" id="sensorStateLabel">未解析</div></div>
+            <div class="meta-card"><div class="meta-label">現在候補</div><div class="meta-value" id="sensorModeLabel">-</div></div>
+        </div>
+        <div class="panel-actions">
+            <button type="button" class="start-btn" onclick="startSensorMonitoring()">センサー計測を開始</button>
+            <button type="button" class="stop-btn" onclick="stopSensorMonitoring()">計測を停止</button>
+            <button type="button" class="export-btn" onclick="exportSensorTrips()">JSONを出力</button>
+            <button type="button" class="clear-btn" onclick="clearSensorTrips()">記録をクリア</button>
+        </div>
     </div>
-    <div class="panel-actions">
-        <button type="button" class="start-btn" onclick="startSensorMonitoring()">センサー計測を開始</button>
-        <button type="button" class="stop-btn" onclick="stopSensorMonitoring()">計測を停止</button>
-        <button type="button" class="export-btn" onclick="exportSensorTrips()">JSONを出力</button>
-        <button type="button" class="clear-btn" onclick="clearSensorTrips()">記録をクリア</button>
-    </div>
-</div>
 
-<div id="sensorConfigPanel">
-    <label>判定設定（後で実測に合わせて変更可能）</label>
-    <div class="config-grid">
-        <div><label>停止速度閾値 (m/s)</label><input type="number" id="cfgStopSpeedThreshold" step="0.1"></div>
-        <div><label>停止継続時間 (秒)</label><input type="number" id="cfgStopDurationSec" step="1"></div>
-        <div><label>短いバス停止許容 (秒)</label><input type="number" id="cfgBusShortStopSec" step="1"></div>
-        <div><label>GPS平滑点数</label><input type="number" id="cfgGpsSmoothPoints" step="1"></div>
-        <div><label>加速度停止分散閾値</label><input type="number" id="cfgAccelVarianceThreshold" step="0.01"></div>
-        <div><label>解析窓 (秒)</label><input type="number" id="cfgAnalysisWindowSec" step="1"></div>
-        <div><label>歩行速度下限 (m/s)</label><input type="number" id="cfgWalkMinSpeed" step="0.1"></div>
-        <div><label>歩行速度上限 (m/s)</label><input type="number" id="cfgWalkMaxSpeed" step="0.1"></div>
-        <div><label>自転車速度下限 (m/s)</label><input type="number" id="cfgBikeMinSpeed" step="0.1"></div>
-        <div><label>自転車速度上限 (m/s)</label><input type="number" id="cfgBikeMaxSpeed" step="0.1"></div>
-        <div><label>電車速度下限 (m/s)</label><input type="number" id="cfgRailMinSpeed" step="0.1"></div>
-        <div><label>自動車速度下限 (m/s)</label><input type="number" id="cfgCarMinSpeed" step="0.1"></div>
+    <div id="sensorConfigPanel">
+        <label>判定設定（後で実測に合わせて変更可能）</label>
+        <div class="config-grid">
+            <div><label>停止速度閾値 (m/s)</label><input type="number" id="cfgStopSpeedThreshold" step="0.1"></div>
+            <div><label>停止継続時間 (秒)</label><input type="number" id="cfgStopDurationSec" step="1"></div>
+            <div><label>短いバス停止許容 (秒)</label><input type="number" id="cfgBusShortStopSec" step="1"></div>
+            <div><label>GPS平滑点数</label><input type="number" id="cfgGpsSmoothPoints" step="1"></div>
+            <div><label>加速度停止分散閾値</label><input type="number" id="cfgAccelVarianceThreshold" step="0.01"></div>
+            <div><label>解析窓 (秒)</label><input type="number" id="cfgAnalysisWindowSec" step="1"></div>
+            <div><label>歩行速度下限 (m/s)</label><input type="number" id="cfgWalkMinSpeed" step="0.1"></div>
+            <div><label>歩行速度上限 (m/s)</label><input type="number" id="cfgWalkMaxSpeed" step="0.1"></div>
+            <div><label>自転車速度下限 (m/s)</label><input type="number" id="cfgBikeMinSpeed" step="0.1"></div>
+            <div><label>自転車速度上限 (m/s)</label><input type="number" id="cfgBikeMaxSpeed" step="0.1"></div>
+            <div><label>電車速度下限 (m/s)</label><input type="number" id="cfgRailMinSpeed" step="0.1"></div>
+            <div><label>自動車速度下限 (m/s)</label><input type="number" id="cfgCarMinSpeed" step="0.1"></div>
+        </div>
+        <div class="panel-actions">
+            <button type="button" class="export-btn" onclick="saveSensorConfigFromUI()">設定を保存</button>
+        </div>
     </div>
-    <div class="panel-actions">
-        <button type="button" class="export-btn" onclick="saveSensorConfigFromUI()">設定を保存</button>
+
+    <div id="sensorOutputPanel">
+        <label>自動判定ログ（JSON配列）</label>
+        <textarea id="sensorJsonOutput" readonly></textarea>
+        <div class="sensor-note">出力はISO8601形式です。Fitbit側の時刻と突き合わせる前提で、全時刻を toISOString() ベースで保持します。</div>
     </div>
-</div>
 
-<div id="sensorOutputPanel">
-    <label>自動判定ログ（JSON配列）</label>
-    <textarea id="sensorJsonOutput" readonly></textarea>
-    <div class="sensor-note">出力はISO8601形式です。Fitbit側の時刻と突き合わせる前提で、全時刻を toISOString() ベースで保持します。</div>
-</div>
+    <div id="sensorTripsPanel">
+        <label>検出結果一覧</label>
+        <div id="sensorTripsList" class="sensor-trip-list"></div>
+    </div>
 
-<div id="sensorTripsPanel">
-    <label>検出結果一覧</label>
-    <div id="sensorTripsList" class="sensor-trip-list"></div>
-</div>
-
-<div id="sensorCorrectionPanel">
-    <label>修正履歴</label>
-    <div class="sensor-note">自動判定を手動修正した履歴を残し、閾値調整の材料にします。</div>
-    <div id="sensorCorrectionLog"></div>
+    <div id="sensorCorrectionPanel">
+        <label>修正履歴</label>
+        <div class="sensor-note">自動判定を手動修正した履歴を残し、閾値調整の材料にします。</div>
+        <div id="sensorCorrectionLog"></div>
+    </div>
 </div>
 
 <script>
@@ -633,6 +679,9 @@ const PRESET_ROUTE_KEY = "idoukeiro_preset_route_v5";
 const SENSOR_CONFIG_KEY = "idoukeiro_sensor_config_v1";
 const SENSOR_TRIPS_KEY = "idoukeiro_sensor_trips_v1";
 const SENSOR_CORRECTIONS_KEY = "idoukeiro_sensor_corrections_v1";
+const SENSOR_ENDPOINTS_KEY = "idoukeiro_sensor_endpoints_v1";
+const ADMIN_VIEW_KEY = "idoukeiro_admin_view_v1";
+const ADMIN_VIEW_QUERY_VALUE = "1";
 
 const DEFAULT_SENSOR_CONFIG = {
     stopSpeedThreshold: 0.5,
@@ -670,6 +719,7 @@ let reminderTimerID = null;
 let reminderShown = false;
 
 let sensorConfig = { ...DEFAULT_SENSOR_CONFIG };
+let sensorEndpoints = { currentInfoUrl: WEBAPP_URL, gpsInfoUrl: "" };
 let sensorState = null;
 
 let compiledRoute = []; 
@@ -703,8 +753,26 @@ window.addEventListener("DOMContentLoaded", function(){
         }
     }
 
-    initializeSensorModule();
+    applyAdminViewVisibility();
+    if (isAdminView()) {
+        initializeSensorModule();
+    }
 });
+
+function isAdminView(){
+    const params = new URLSearchParams(window.location.search);
+    if(params.get("admin") === ADMIN_VIEW_QUERY_VALUE){
+        localStorage.setItem(ADMIN_VIEW_KEY, "true");
+        return true;
+    }
+    return localStorage.getItem(ADMIN_VIEW_KEY) === "true";
+}
+
+function applyAdminViewVisibility(){
+    const section = document.getElementById("sensorAdminSection");
+    if(!section) return;
+    section.style.display = isAdminView() ? "block" : "none";
+}
 
 function buildDefaultInitialRoute(direction) {
     const container = document.getElementById("routeNodesContainer");
@@ -1607,12 +1675,57 @@ function initializeSensorModule(){
         analysisTimerId: null
     };
 
+    loadSensorEndpoints();
     loadSensorConfig();
     loadSensorDataFromStorage();
+    renderSensorEndpointsToUI();
     renderSensorConfigToUI();
     renderSensorDashboard();
     bindSensorConfigInputs();
+    bindSensorEndpointInputs();
     updateSensorStatusPill("停止中", false, false);
+}
+
+function loadSensorEndpoints(){
+    const saved = localStorage.getItem(SENSOR_ENDPOINTS_KEY);
+    if(!saved){
+        sensorEndpoints = { currentInfoUrl: WEBAPP_URL, gpsInfoUrl: "" };
+        return;
+    }
+    try{
+        sensorEndpoints = { ...sensorEndpoints, ...JSON.parse(saved) };
+        if(!sensorEndpoints.currentInfoUrl) sensorEndpoints.currentInfoUrl = WEBAPP_URL;
+        if(typeof sensorEndpoints.gpsInfoUrl !== "string") sensorEndpoints.gpsInfoUrl = "";
+    }catch(e){
+        sensorEndpoints = { currentInfoUrl: WEBAPP_URL, gpsInfoUrl: "" };
+    }
+}
+
+function saveSensorEndpoints(){
+    localStorage.setItem(SENSOR_ENDPOINTS_KEY, JSON.stringify(sensorEndpoints));
+}
+
+function renderSensorEndpointsToUI(){
+    const currentUrlEl = document.getElementById("cfgSensorCurrentSheetUrl");
+    const gpsUrlEl = document.getElementById("cfgSensorGpsSheetUrl");
+    if(currentUrlEl) currentUrlEl.value = sensorEndpoints.currentInfoUrl || WEBAPP_URL;
+    if(gpsUrlEl) gpsUrlEl.value = sensorEndpoints.gpsInfoUrl || "";
+}
+
+function bindSensorEndpointInputs(){
+    ["cfgSensorCurrentSheetUrl", "cfgSensorGpsSheetUrl"].forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.addEventListener("change", saveSensorEndpointsFromUI);
+    });
+}
+
+function saveSensorEndpointsFromUI(){
+    const currentUrlEl = document.getElementById("cfgSensorCurrentSheetUrl");
+    const gpsUrlEl = document.getElementById("cfgSensorGpsSheetUrl");
+    sensorEndpoints.currentInfoUrl = currentUrlEl ? currentUrlEl.value.trim() || WEBAPP_URL : WEBAPP_URL;
+    sensorEndpoints.gpsInfoUrl = gpsUrlEl ? gpsUrlEl.value.trim() : "";
+    saveSensorEndpoints();
+    renderSensorDashboard();
 }
 
 function loadSensorConfig(){
@@ -1797,6 +1910,7 @@ function handleGpsPosition(position){
         accuracy: typeof coords.accuracy === "number" ? coords.accuracy : null
     };
     sensorState.gpsSamples.push(sample);
+    sendSensorGpsSample(sample);
     trimSensorSamples();
     analyzeSensorData();
 }
@@ -1858,6 +1972,7 @@ function runSensorAnalysis(){
     document.getElementById("sensorModeLabel").textContent = stationary ? "停止" : `${modeCandidate.mode} / ${Math.round(modeCandidate.confidence * 100)}%`;
 
     updateSensorTripState(stationary, modeCandidate, features);
+    sendSensorCurrentSnapshot(stationary, modeCandidate, features);
     renderSensorDashboard();
 }
 
@@ -2092,7 +2207,64 @@ function finalizeSensorTrip(alightingMs, features){
     sensorState.currentState = "unknown";
     sensorState.currentStateSinceMs = null;
     persistSensorData();
+    sendSensorCurrentSnapshot(true, { mode: trip.mode, confidence: trip.confidence }, trip.evidence || features || {});
     renderSensorDashboard();
+}
+
+function sendSensorCurrentSnapshot(stationary, modeCandidate, features){
+    if(!sensorEndpoints.currentInfoUrl) return;
+    const payload = {
+        action: "sensor_current_snapshot",
+        currentTimeIso: new Date().toISOString(),
+        currentState: sensorState.currentState,
+        stationary: !!stationary,
+        currentModeCandidate: modeCandidate,
+        currentTrip: sensorState.currentTrip ? {
+            id: sensorState.currentTrip.id,
+            mode: sensorState.currentTrip.mode,
+            boarding_time: sensorState.currentTrip.boarding_time,
+            confidence: sensorState.currentTrip.confidence
+        } : null,
+        gpsSampleCount: sensorState.gpsSamples.length,
+        accelSampleCount: sensorState.accelSamples.length,
+        features: features || null
+    };
+    const signature = JSON.stringify({
+        state: payload.currentState,
+        stationary: payload.stationary,
+        mode: payload.currentModeCandidate ? payload.currentModeCandidate.mode : null,
+        confidence: payload.currentModeCandidate ? payload.currentModeCandidate.confidence : null,
+        tripId: payload.currentTrip ? payload.currentTrip.id : null,
+        gpsSampleCount: payload.gpsSampleCount,
+        accelSampleCount: payload.accelSampleCount
+    });
+    if(sensorState.lastCurrentSnapshotSignature === signature) return;
+    sensorState.lastCurrentSnapshotSignature = signature;
+    postJsonToEndpoint(sensorEndpoints.currentInfoUrl, payload);
+}
+
+function sendSensorGpsSample(sample){
+    if(!sensorEndpoints.gpsInfoUrl) return;
+    const payload = {
+        action: "sensor_gps_sample",
+        timestampIso: sample.timestampIso,
+        timestampMs: sample.timestampMs,
+        latitude: sample.latitude,
+        longitude: sample.longitude,
+        speed: sample.speed,
+        accuracy: sample.accuracy,
+        currentState: sensorState.currentState,
+        currentModeCandidate: sensorState.currentModeCandidate
+    };
+    postJsonToEndpoint(sensorEndpoints.gpsInfoUrl, payload);
+}
+
+function postJsonToEndpoint(url, payload){
+    fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+    }).catch(() => {});
 }
 
 function resolveNearestLocation(alightingMs){
