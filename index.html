@@ -123,6 +123,34 @@ select.input-error{
 .access-panel.subject-mode .logout-btn{
     display:none;
 }
+.access-panel.admin-mode{
+    width:auto;
+    max-width:none;
+    padding:0;
+    border:none;
+    background:transparent;
+    box-shadow:none;
+    backdrop-filter:none;
+}
+.access-panel.admin-mode .access-title,
+.access-panel.admin-mode .access-state,
+.access-panel.admin-mode .access-note,
+.access-panel.admin-mode .admin-popover{
+    display:none;
+}
+.access-panel.admin-mode .logout-btn{
+    display:inline-flex !important;
+}
+.access-panel.admin-mode .access-buttons{
+    margin:0;
+}
+.access-panel.admin-mode .subject-btn{
+    min-height:32px;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:11px;
+    box-shadow:0 4px 12px rgba(15,23,42,0.12);
+}
 .access-panel .access-title{
     font-size:11px;
     font-weight:800;
@@ -152,7 +180,15 @@ select.input-error{
     font-size:12px;
     cursor:pointer;
 }
+.access-panel .subject-btn{
+    width:88px;
+    min-width:88px;
+    touch-action:manipulation;
+    user-select:none;
+    -webkit-user-select:none;
+}
 .access-panel .subject-btn{ background:#e2e8f0; color:#334155; }
+.access-panel .admin-view-btn{ background:#dbeafe; color:#1d4ed8; }
 .access-panel .admin-btn{ background:#1d4ed8; color:#fff; }
 .access-panel .logout-btn{ background:#fee2e2; color:#b91c1c; }
 .access-panel .access-login{
@@ -653,7 +689,7 @@ button.mainbtn.undo.show { display: block; }
     <div class="access-title">ログ</div>
     <div id="roleState" class="access-state">被験者モード</div>
     <div class="access-buttons">
-            <button type="button" id="roleChooserButton" class="subject-btn" onclick="toggleRolePopover()">被験者 / 管理者</button>
+            <button type="button" id="roleChooserButton" class="subject-btn" onclick="toggleRolePopover()">被験者</button>
             <button type="button" id="roleLogoutButton" class="logout-btn" onclick="logoutAdminMode()">解除</button>
     </div>
     <div id="adminPopover" class="admin-popover">
@@ -872,6 +908,7 @@ let autosaveTimerID = null;
 let sensorConfig = { ...DEFAULT_SENSOR_CONFIG };
 let sensorEndpoints = { currentInfoUrl: WEBAPP_URL, gpsInfoUrl: "" };
 let sensorState = null;
+let adminViewEnabled = false;
 
 let compiledRoute = []; 
 let currentStepIndex = 0; 
@@ -896,11 +933,14 @@ window.addEventListener("DOMContentLoaded", function(){
     const roleLogoutButton = document.getElementById("roleLogoutButton");
     const rolePopover = document.getElementById("adminPopover");
     if(roleChooserButton){
-        roleChooserButton.addEventListener("click", function(event){
+        const openRolePopover = function(event){
             event.preventDefault();
             event.stopPropagation();
             toggleRolePopover();
-        });
+        };
+        roleChooserButton.addEventListener("click", openRolePopover);
+        roleChooserButton.addEventListener("pointerup", openRolePopover);
+        roleChooserButton.addEventListener("touchend", openRolePopover);
     }
     if(roleLogoutButton){
         roleLogoutButton.addEventListener("click", function(event){
@@ -943,13 +983,25 @@ window.addEventListener("DOMContentLoaded", function(){
 
 function renderRoleState(){
     const roleState = document.getElementById("roleState");
+    const roleChooserButton = document.getElementById("roleChooserButton");
+    const roleLogoutButton = document.getElementById("roleLogoutButton");
     const panel = document.querySelector(".access-panel");
     const popover = document.getElementById("adminPopover");
-    if(!roleState) return;
     const admin = isAdminView();
-    roleState.textContent = admin ? "管理者モード" : "被験者モード";
+    if(roleState){
+        roleState.textContent = "";
+        roleState.style.display = "none";
+    }
+    if(roleChooserButton){
+        roleChooserButton.textContent = admin ? "管理者" : "被験者";
+        roleChooserButton.classList.toggle("admin-view-btn", admin);
+    }
+    if(roleLogoutButton){
+        roleLogoutButton.style.display = admin ? "inline-flex" : "none";
+    }
     if(panel){
         panel.classList.toggle("subject-mode", !admin);
+        panel.classList.toggle("admin-mode", admin);
     }
     if(popover && !admin){
         popover.classList.remove("show");
@@ -957,7 +1009,7 @@ function renderRoleState(){
 }
 
 function setAdminView(enabled){
-    localStorage.setItem(ADMIN_VIEW_KEY, enabled ? "true" : "false");
+    adminViewEnabled = !!enabled;
     applyAdminViewVisibility();
     renderRoleState();
     if(enabled){
@@ -1025,10 +1077,9 @@ function logoutAdminMode(){
 function isAdminView(){
     const params = new URLSearchParams(window.location.search);
     if(params.get("admin") === ADMIN_VIEW_QUERY_VALUE){
-        localStorage.setItem(ADMIN_VIEW_KEY, "true");
         return true;
     }
-    return localStorage.getItem(ADMIN_VIEW_KEY) === "true";
+    return adminViewEnabled;
 }
 
 function applyAdminViewVisibility(){
