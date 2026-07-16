@@ -75,6 +75,133 @@ select.input-error{
 .resume-banner .resume-yes{ background:#2c3e50; color:#fff; }
 .resume-banner .resume-no{ background:#fff; color:#c0392b; border:2px solid #c0392b; }
 
+/* ===== ログインパネル ===== */
+.access-panel{
+    position:fixed;
+    top:12px;
+    left:12px;
+    z-index:1000;
+    width:auto;
+    max-width:270px;
+    margin:0;
+    background:rgba(255,255,255,0.96);
+    border:1px solid #dbeafe;
+    border-radius:14px;
+    padding:10px;
+    box-shadow:0 8px 24px rgba(15,23,42,0.12);
+    backdrop-filter: blur(8px);
+}
+.access-panel.subject-mode{
+    width:auto;
+    max-width:none;
+    padding:0;
+    border:none;
+    background:transparent;
+    box-shadow:none;
+    backdrop-filter:none;
+}
+.access-panel.subject-mode .access-title,
+.access-panel.subject-mode .access-state,
+.access-panel.subject-mode .logout-btn,
+.access-panel.subject-mode .access-note{
+    display:none;
+}
+.access-panel.subject-mode .admin-popover.show .access-login,
+.access-panel.subject-mode .admin-popover.show .access-note{
+    display:block;
+}
+.access-panel.subject-mode .access-buttons{
+    margin:0;
+}
+.access-panel.subject-mode .subject-btn{
+    min-height:32px;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:11px;
+    box-shadow:0 4px 12px rgba(15,23,42,0.12);
+}
+.access-panel.subject-mode .logout-btn{
+    display:none;
+}
+.access-panel .access-title{
+    font-size:11px;
+    font-weight:800;
+    color:#475569;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    margin-bottom:6px;
+}
+.access-panel .access-state{
+    font-size:14px;
+    font-weight:800;
+    color:#1d4ed8;
+    margin-bottom:8px;
+}
+.access-panel .access-buttons{
+    display:flex;
+    gap:6px;
+    margin-bottom:8px;
+}
+.access-panel .access-buttons button,
+.access-panel .access-login button{
+    min-height:38px;
+    border:none;
+    border-radius:10px;
+    padding:8px 10px;
+    font-weight:700;
+    font-size:12px;
+    cursor:pointer;
+}
+.access-panel .subject-btn{ background:#e2e8f0; color:#334155; }
+.access-panel .admin-btn{ background:#1d4ed8; color:#fff; }
+.access-panel .logout-btn{ background:#fee2e2; color:#b91c1c; }
+.access-panel .access-login{
+    display:block;
+}
+.access-panel .admin-popover{
+    display:none;
+    margin-top:8px;
+    width:min(270px, calc(100vw - 24px));
+    box-sizing:border-box;
+}
+.access-panel .admin-popover.show{
+    display:block;
+}
+.access-panel .role-choice-row{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+}
+.access-panel .role-choice-row button{
+    width:100%;
+}
+.access-panel .role-choice-row .subject-choice-btn{
+    background:#e2e8f0;
+    color:#334155;
+}
+.access-panel .role-choice-row .admin-choice-btn{
+    background:#1d4ed8;
+    color:#fff;
+}
+.access-panel input[type="password"]{
+    flex:1;
+    width:100%;
+    min-height:38px;
+    border:1px solid #cbd5e1;
+    border-radius:10px;
+    padding:8px 10px;
+    box-sizing:border-box;
+    font-size:12px;
+    background:#fff;
+}
+.access-panel .access-note{
+    margin-top:6px;
+    font-size:11px;
+    line-height:1.4;
+    color:#64748b;
+    word-break:break-word;
+}
+
 /* ===== 📋 ルート設定エリア ===== */
 .route-builder-box {
     background: #fff;
@@ -522,6 +649,28 @@ button.mainbtn.undo.show { display: block; }
 </head>
 <body>
 
+<div class="access-panel">
+    <div class="access-title">ログ</div>
+    <div id="roleState" class="access-state">被験者モード</div>
+    <div class="access-buttons">
+            <button type="button" id="roleChooserButton" class="subject-btn" onclick="toggleRolePopover()">被験者 / 管理者</button>
+            <button type="button" id="roleLogoutButton" class="logout-btn" onclick="logoutAdminMode()">解除</button>
+    </div>
+    <div id="adminPopover" class="admin-popover">
+        <div class="access-login">
+            <div class="role-choice-row">
+                <button type="button" class="subject-choice-btn" onclick="switchToSubjectMode()">被験者として使う</button>
+                <button type="button" class="admin-choice-btn" onclick="showAdminPasswordInput()">管理者として使う</button>
+            </div>
+            <div id="adminPasswordBox" style="display:none; margin-top:8px;">
+                <input type="password" id="adminPasswordInput" placeholder="管理者パスワード">
+                <button type="button" class="admin-btn" onclick="attemptAdminLogin()">ログイン</button>
+            </div>
+        </div>
+        <div class="access-note">被験者表示では自動判定は出しません。管理者ログインでのみ表示されます。</div>
+    </div>
+</div>
+
 <h2>移動記録ナビシステム</h2>
 
 <div id="resumeBanner" class="resume-banner">
@@ -682,6 +831,7 @@ const SENSOR_CORRECTIONS_KEY = "idoukeiro_sensor_corrections_v1";
 const SENSOR_ENDPOINTS_KEY = "idoukeiro_sensor_endpoints_v1";
 const ADMIN_VIEW_KEY = "idoukeiro_admin_view_v1";
 const ADMIN_VIEW_QUERY_VALUE = "1";
+const ADMIN_PASSWORD = "kanagawa1212";
 
 const DEFAULT_SENSOR_CONFIG = {
     stopSpeedThreshold: 0.5,
@@ -717,6 +867,7 @@ let records=[];
 let lastReminderTime = null;
 let reminderTimerID = null;
 let reminderShown = false;
+let autosaveTimerID = null;
 
 let sensorConfig = { ...DEFAULT_SENSOR_CONFIG };
 let sensorEndpoints = { currentInfoUrl: WEBAPP_URL, gpsInfoUrl: "" };
@@ -741,6 +892,31 @@ window.addEventListener("DOMContentLoaded", function(){
         buildDefaultInitialRoute("行き");
     }
 
+    const roleChooserButton = document.getElementById("roleChooserButton");
+    const roleLogoutButton = document.getElementById("roleLogoutButton");
+    const rolePopover = document.getElementById("adminPopover");
+    if(roleChooserButton){
+        roleChooserButton.addEventListener("click", function(event){
+            event.preventDefault();
+            event.stopPropagation();
+            toggleRolePopover();
+        });
+    }
+    if(roleLogoutButton){
+        roleLogoutButton.addEventListener("click", function(event){
+            event.preventDefault();
+            event.stopPropagation();
+            logoutAdminMode();
+        });
+    }
+    document.addEventListener("click", function(event){
+        if(!rolePopover || !rolePopover.classList.contains("show")) return;
+        const panel = document.querySelector(".access-panel");
+        if(panel && !panel.contains(event.target)){
+            rolePopover.classList.remove("show");
+        }
+    });
+
     const savedName = localStorage.getItem("idoukeiro_name_v5");
     if(savedName) document.getElementById("name").value = savedName;
 
@@ -754,10 +930,97 @@ window.addEventListener("DOMContentLoaded", function(){
     }
 
     applyAdminViewVisibility();
+    renderRoleState();
     if (isAdminView()) {
         initializeSensorModule();
     }
+
+    window.addEventListener("pagehide", persistCurrentSessionState);
+    document.addEventListener("visibilitychange", function(){
+        if(document.visibilityState === "hidden") persistCurrentSessionState();
+    });
 });
+
+function renderRoleState(){
+    const roleState = document.getElementById("roleState");
+    const panel = document.querySelector(".access-panel");
+    const popover = document.getElementById("adminPopover");
+    if(!roleState) return;
+    const admin = isAdminView();
+    roleState.textContent = admin ? "管理者モード" : "被験者モード";
+    if(panel){
+        panel.classList.toggle("subject-mode", !admin);
+    }
+    if(popover && !admin){
+        popover.classList.remove("show");
+    }
+}
+
+function setAdminView(enabled){
+    localStorage.setItem(ADMIN_VIEW_KEY, enabled ? "true" : "false");
+    applyAdminViewVisibility();
+    renderRoleState();
+    if(enabled){
+        ensureSensorModuleInitialized();
+        if(running) startSensorMonitoring();
+    }else{
+        stopSensorMonitoring();
+    }
+}
+
+function persistCurrentSessionState(){
+    if(running || isPaused){
+        saveSession();
+    }
+}
+
+function startAutosaveLoop(){
+    if(autosaveTimerID) return;
+    autosaveTimerID = setInterval(persistCurrentSessionState, 10000);
+}
+
+function stopAutosaveLoop(){
+    if(!autosaveTimerID) return;
+    clearInterval(autosaveTimerID);
+    autosaveTimerID = null;
+}
+
+function switchToSubjectMode(){
+    const passwordEl = document.getElementById("adminPasswordInput");
+    const passwordBox = document.getElementById("adminPasswordBox");
+    if(passwordEl) passwordEl.value = "";
+    if(passwordBox) passwordBox.style.display = "none";
+    setAdminView(false);
+}
+
+function toggleRolePopover(){
+    if(isAdminView()) return;
+    const popover = document.getElementById("adminPopover");
+    if(!popover) return;
+    popover.classList.toggle("show");
+}
+
+function showAdminPasswordInput(){
+    const passwordBox = document.getElementById("adminPasswordBox");
+    const passwordEl = document.getElementById("adminPasswordInput");
+    if(passwordBox) passwordBox.style.display = "block";
+    if(passwordEl) passwordEl.focus();
+}
+
+function attemptAdminLogin(){
+    const passwordEl = document.getElementById("adminPasswordInput");
+    const input = passwordEl ? passwordEl.value.trim() : "";
+    if(input !== ADMIN_PASSWORD){
+        alert("管理者パスワードが違います。");
+        return;
+    }
+    if(passwordEl) passwordEl.value = "";
+    setAdminView(true);
+}
+
+function logoutAdminMode(){
+    switchToSubjectMode();
+}
 
 function isAdminView(){
     const params = new URLSearchParams(window.location.search);
@@ -1010,13 +1273,27 @@ function syncPostureSelectorUI() {
     const postureTitle = document.getElementById("postureBoxTitle");
     const currentStep = compiledRoute[currentStepIndex];
     const fixedSeatedModes = ["バイク", "自動車", "自転車"];
+    const standingPreferredModes = ["電車", "バス"];
     const isWalkingMove = currentAppState === "MOVING" && currentStep && currentStep.nextMode === "徒歩";
     const isFixedSeatedMove = currentAppState === "MOVING" && currentStep && fixedSeatedModes.includes(currentStep.nextMode);
+    const isStandingPreferredMove = currentStep && standingPreferredModes.includes(currentStep.nextMode);
 
     if (currentAppState === "MOVING" && isWalkingMove) {
         postureSelectEl.value = "立つ";
         postureSelectEl.disabled = true;
         postureTitle.textContent = "🧍 徒歩中は姿勢を自動で「立つ」に設定しています";
+        postureContainer.style.display = "block";
+        return;
+    }
+
+    if ((currentAppState === "MOVING" || currentAppState === "WAITING") && isStandingPreferredMove) {
+        if (!postureSelectEl.value) {
+            postureSelectEl.value = "立つ";
+        }
+        postureSelectEl.disabled = false;
+        postureTitle.textContent = currentAppState === "WAITING"
+            ? "🧍 電車・バスの待機は「立つ」を初期値にしています（変更可）"
+            : "🧍 電車・バスの移動は「立つ」を初期値にしています（変更可）";
         postureContainer.style.display = "block";
         return;
     }
@@ -1201,6 +1478,11 @@ function handlePrimaryAction() {
         sectionStart = now;
         // ※タイマーはこの関数の末尾でrunning=trueの場合にまとめて1つだけ開始する（二重生成を防止）
 
+        if(isAdminView()){
+            ensureSensorModuleInitialized();
+            startSensorMonitoring();
+        }
+
         togglePauseButton(true);
         document.getElementById("finishBtn").disabled = false;
         hideUndo();
@@ -1212,6 +1494,7 @@ function handlePrimaryAction() {
         currentAppState = "MOVING";
         const nextTarget = compiledRoute[currentStepIndex + 1];
         setupPrimaryButton("arrival", `📍 ${nextTarget.place} に到着した`);
+        startAutosaveLoop();
         
     } else if (currentAppState === "MOVING") {
         const currentOrigin = compiledRoute[currentStepIndex];
@@ -1396,6 +1679,7 @@ function finishAll() {
         clearInterval(reminderTimerID);
         reminderTimerID = null;
     }
+    stopAutosaveLoop();
     hideReminderBanner();
     
     // ★ 画面上の表示を完全に「00:00:00」に書き換えてロック停止させる
@@ -1414,6 +1698,7 @@ function finishAll() {
     
     showUndo();
     updateNavigationDisplay();
+    if(isAdminView()) stopSensorMonitoring();
     clearSession();
     alert("すべての移動記録を終了しました。");
 }
@@ -1455,6 +1740,7 @@ function togglePause(){
         timerID=setInterval(function(){ document.getElementById("timer").innerHTML=format(new Date()-totalStart); },1000);
         resetPendingActionReminder();
     }
+    persistCurrentSessionState();
     saveSession();
 }
 
@@ -1514,6 +1800,8 @@ function resumeSession(state){
     } else {
         timerID=setInterval(function(){ document.getElementById("timer").innerHTML=format(new Date()-totalStart); },1000);
     }
+
+    startAutosaveLoop();
 
     if (currentAppState === "MOVING") {
         const nextTarget = compiledRoute[currentStepIndex + 1];
@@ -1659,6 +1947,19 @@ function saveHistory(record){
 }
 
 function initializeSensorModule(){
+    if(sensorState){
+        loadSensorEndpoints();
+        loadSensorConfig();
+        loadSensorDataFromStorage();
+        renderSensorEndpointsToUI();
+        renderSensorConfigToUI();
+        renderSensorDashboard();
+        bindSensorConfigInputs();
+        bindSensorEndpointInputs();
+        updateSensorStatusPill(sensorState.running ? "計測中" : "停止中", !!sensorState.running, false);
+        return;
+    }
+
     sensorState = {
         running: false,
         gpsWatchId: null,
@@ -1684,6 +1985,12 @@ function initializeSensorModule(){
     bindSensorConfigInputs();
     bindSensorEndpointInputs();
     updateSensorStatusPill("停止中", false, false);
+}
+
+function ensureSensorModuleInitialized(){
+    if(isAdminView()){
+        initializeSensorModule();
+    }
 }
 
 function loadSensorEndpoints(){
@@ -1826,6 +2133,8 @@ function updateSensorStatusPill(text, active, isError){
 }
 
 function startSensorMonitoring(){
+    if(!isAdminView()) return;
+    if(!sensorState) initializeSensorModule();
     if(sensorState.running) return;
     const startFlow = () => {
         sensorState.running = true;
@@ -1875,6 +2184,7 @@ function startSensorMonitoring(){
 }
 
 function stopSensorMonitoring(){
+    if(!sensorState) return;
     if(sensorState.gpsWatchId !== null && navigator.geolocation){
         navigator.geolocation.clearWatch(sensorState.gpsWatchId);
         sensorState.gpsWatchId = null;
@@ -1899,6 +2209,7 @@ function handleSensorError(error){
 }
 
 function handleGpsPosition(position){
+    if(!isAdminView()) return;
     const coords = position.coords || {};
     const timestampMs = typeof position.timestamp === "number" ? position.timestamp : Date.now();
     const sample = {
@@ -1916,6 +2227,7 @@ function handleGpsPosition(position){
 }
 
 function handleMotionEvent(event){
+    if(!isAdminView()) return;
     const acceleration = event.acceleration || event.accelerationIncludingGravity || {};
     const timestampMs = Date.now();
     const sample = {
